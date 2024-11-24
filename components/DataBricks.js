@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Trash, Eye, EyeOff } from "lucide-react";
+import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react"; // Add Maximize2 icon
 import { cn } from "@/lib/utils";
 
 const itemVariants = {
@@ -56,6 +56,7 @@ const DataBricks = ({
   const [categoryFilter, setCategoryFilter] = useState(filter);
   const [layoutMode, setLayoutMode] = useState("masonry");
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [fullWidthCardId, setFullWidthCardId] = useState(null);
 
   useEffect(() => {
     const filterTest = getFilterTest(categoryFilter);
@@ -87,15 +88,22 @@ const DataBricks = ({
           animate="visible"
           exit="exit"
           layout
-          onClick={() =>
-            setSelectedCardId((prevId) => (prevId === item.id ? null : item.id))
-          }
+          onClick={() => {
+            // Handle double-size functionality on click
+            if (fullWidthCardId !== item.id) {
+              setSelectedCardId((prevId) =>
+                prevId === item.id ? null : item.id
+              );
+            }
+          }}
           className={cn(
+            "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
             layoutMode === "masonry" && "w-full",
             layoutMode === "fit-rows" && "w-full",
             layoutMode === "vertical" && "w-full",
-            "aspect-square cursor-pointer", // Ensure each card is a square and has a pointer cursor
-            selectedCardId === item.id && "scale-[2] col-span-2 row-span-2" // Double size if selected
+            selectedCardId === item.id && "scale-[2] col-span-2 row-span-2", // Double size if clicked
+            fullWidthCardId === item.id &&
+              "col-span-full row-span-full w-full aspect-square" // Full width if maximized
           )}
         >
           <Card className="shadow relative h-full">
@@ -157,6 +165,25 @@ const DataBricks = ({
                   <TooltipContent>
                     {item.isHidden ? "Show Item" : "Hide Item"}
                   </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Maximize2
+                      className="cursor-pointer text-green-500 hover:text-green-700"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent click event bubbling
+                        setFullWidthCardId((prevId) =>
+                          prevId === item.id ? null : item.id
+                        );
+                        setSelectedCardId(null); // Clear double-size state
+                      }}
+                      size={20}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Maximize Item</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
