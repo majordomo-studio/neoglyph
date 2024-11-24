@@ -55,6 +55,7 @@ const DataBricks = ({
   const [sortHistory, setSortHistory] = useState(sortBy);
   const [categoryFilter, setCategoryFilter] = useState(filter);
   const [layoutMode, setLayoutMode] = useState("masonry");
+  const [selectedCardId, setSelectedCardId] = useState(null);
 
   useEffect(() => {
     const filterTest = getFilterTest(categoryFilter);
@@ -86,11 +87,15 @@ const DataBricks = ({
           animate="visible"
           exit="exit"
           layout
+          onClick={() =>
+            setSelectedCardId((prevId) => (prevId === item.id ? null : item.id))
+          }
           className={cn(
             layoutMode === "masonry" && "w-full",
             layoutMode === "fit-rows" && "w-full",
             layoutMode === "vertical" && "w-full",
-            "aspect-square" // Ensure each card is a square
+            "aspect-square cursor-pointer", // Ensure each card is a square and has a pointer cursor
+            selectedCardId === item.id && "scale-[2] col-span-2 row-span-2" // Double size if selected
           )}
         >
           <Card className="shadow relative h-full">
@@ -101,11 +106,12 @@ const DataBricks = ({
                   <TooltipTrigger>
                     <Trash
                       className="cursor-pointer text-red-500 hover:text-red-700"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent click event bubbling
                         setFilteredItems((prev) =>
                           prev.filter((i) => i.id !== item.id)
-                        )
-                      }
+                        );
+                      }}
                       size={20}
                     />
                   </TooltipTrigger>
@@ -119,29 +125,31 @@ const DataBricks = ({
                     {item.isHidden ? (
                       <Eye
                         className="cursor-pointer text-blue-500 hover:text-blue-700"
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent click event bubbling
                           setFilteredItems((prev) =>
                             prev.map((i) =>
                               i.id === item.id
                                 ? { ...i, isHidden: !i.isHidden }
                                 : i
                             )
-                          )
-                        }
+                          );
+                        }}
                         size={20}
                       />
                     ) : (
                       <EyeOff
                         className="cursor-pointer text-blue-500 hover:text-blue-700"
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent click event bubbling
                           setFilteredItems((prev) =>
                             prev.map((i) =>
                               i.id === item.id
                                 ? { ...i, isHidden: !i.isHidden }
                                 : i
                             )
-                          )
-                        }
+                          );
+                        }}
                         size={20}
                       />
                     )}
@@ -204,9 +212,6 @@ const DataBricks = ({
             layoutMode === "fit-rows" && "grid-cols-1",
             layoutMode === "vertical" && "grid-cols-1"
           )}
-          style={{
-            gridAutoRows: layoutMode === "masonry" ? "masonry" : "auto",
-          }}
         >
           {renderItems()}
         </motion.div>
