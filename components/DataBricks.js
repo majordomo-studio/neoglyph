@@ -66,19 +66,11 @@ const DataBricks = ({
     setFilteredItems(sortedItems);
   }, [categoryFilter, sortHistory, items]);
 
-  // Shuffle items randomly
-  const shuffleItems = () => {
-    const shuffled = [...filteredItems].sort(() => Math.random() - 0.5);
-    setFilteredItems(shuffled);
-  };
-
-  // Toggle visibility (hide/reveal)
-  const toggleVisibility = (itemId) => {
-    setFilteredItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, isHidden: !item.isHidden } : item
-      )
-    );
+  // Helper function to format a key into a readable label
+  const formatKey = (key) => {
+    return key
+      .replace(/_/g, " ") // Replace underscores with spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
   };
 
   // Render items with dynamic layout
@@ -101,10 +93,30 @@ const DataBricks = ({
         <div className="p-4 bg-white rounded-lg shadow">
           <h4 className="font-bold text-lg">{item.title}</h4>
           <p>{item.description}</p>
+          <div className="mt-2 space-y-1">
+            {Object.entries(item).map(([key, value]) => {
+              // Skip rendering known keys (already displayed)
+              if (["id", "title", "description", "category", "isHidden"].includes(key)) {
+                return null;
+              }
+
+              // Render additional fields dynamically
+              return (
+                <div
+                  key={key}
+                  className={`${key}_field text-sm text-gray-600`}
+                >
+                  <span className="font-medium">{formatKey(key)}:</span> {value}
+                </div>
+              );
+            })}
+          </div>
           <div className="flex gap-2 mt-2">
             <Button
               variant="destructive"
-              onClick={() => setFilteredItems((prev) => prev.filter((i) => i.id !== item.id))}
+              onClick={() =>
+                setFilteredItems((prev) => prev.filter((i) => i.id !== item.id))
+              }
             >
               Remove
             </Button>
@@ -129,13 +141,13 @@ const DataBricks = ({
           onChange={(e) => setCategoryFilter(e.target.value || "*")}
           className="w-full max-w-sm"
         />
-        <Button onClick={shuffleItems}>Shuffle</Button>
+        <Button onClick={() => shuffleItems()}>Shuffle</Button>
         <Button onClick={() => setSortHistory(["title"])}>Sort by Title</Button>
-        <Button onClick={() => setSortHistory(["category"])}>
-          Sort by Category
-        </Button>
+        <Button onClick={() => setSortHistory(["category"])}>Sort by Category</Button>
         <Button
-          onClick={() => setLayoutMode(layoutMode === "masonry" ? "vertical" : "masonry")}
+          onClick={() =>
+            setLayoutMode(layoutMode === "masonry" ? "vertical" : "masonry")
+          }
         >
           Toggle Layout
         </Button>

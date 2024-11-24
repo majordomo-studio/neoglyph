@@ -10,7 +10,7 @@ const data = [
   { id: 4, title: "Item 4", description: "This is a square card.", category: "C", size: "square" },
   { id: 5, title: "Item 5", description: "Another wide card.", category: "A", size: "wide" },
   { id: 6, title: "Item 6", description: "Another tall card.", category: "B", size: "tall" },
-  { id: 7, title: "Item 7", description: "Another square card.", category: "A", size: "square" },
+  { id: 7, title: "Item 7", description: "Another square card.", category: "A", size: "square", pataks: "mild" },
   { id: 8, title: "Item 8", description: "A tall card with more details.", category: "C", size: "tall" },
 ];
 
