@@ -87,13 +87,13 @@ const DataBricks = ({
         className={cn(
           layoutMode === "masonry" && "w-full",
           layoutMode === "fit-rows" && "w-full",
-          layoutMode === "vertical" && "w-full"
+          layoutMode === "vertical" && "w-full",
+          "aspect-square" // Ensure each card is a square
         )}
       >
-        <Card className="shadow relative">
+        <Card className="shadow relative h-full">
           {/* Icons in the top-right corner */}
           <div className="absolute top-2 right-2 flex gap-2">
-            {/* Tooltip for Remove Icon */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -111,7 +111,6 @@ const DataBricks = ({
               </Tooltip>
             </TooltipProvider>
 
-            {/* Tooltip for Hide/Show Icon */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
