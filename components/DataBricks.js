@@ -2,11 +2,16 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-/**
- * Animation Variants
- */
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1 },
@@ -18,14 +23,11 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Delay between item animations
+      staggerChildren: 0.1,
     },
   },
 };
 
-/**
- * Utility functions for filtering and sorting
- */
 const getFilterTest = (filter) => {
   if (typeof filter === "function") return filter;
   return (item) => item.category === filter || filter === "*";
@@ -42,9 +44,6 @@ const getItemSorter = (sortHistory, sortAsc = true) => (a, b) => {
   return 0;
 };
 
-/**
- * DataBricks Component
- */
 const DataBricks = ({
   items = [],
   filter = "*",
@@ -65,14 +64,12 @@ const DataBricks = ({
     setFilteredItems(sortedItems);
   }, [categoryFilter, sortHistory, items]);
 
-  // Helper function to format a key into a readable label
   const formatKey = (key) => {
     return key
       .replace(/_/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  // Shuffle items randomly
   const shuffleItems = () => {
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
@@ -87,16 +84,17 @@ const DataBricks = ({
         exit="exit"
         layout
         className={cn(
-          "p-4 bg-gray-100 rounded shadow",
           layoutMode === "masonry" && "w-full",
           layoutMode === "fit-rows" && "w-full",
           layoutMode === "vertical" && "w-full"
         )}
       >
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h4 className="font-bold text-lg">{item.title}</h4>
-          <p>{item.description}</p>
-          <div className="mt-2 space-y-1">
+        <Card className="shadow">
+          <CardHeader>
+            <CardTitle>{item.title}</CardTitle>
+            <CardDescription>{item.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
             {Object.entries(item).map(([key, value]) => {
               if (["id", "title", "description", "category", "isHidden"].includes(key)) {
                 return null;
@@ -107,8 +105,8 @@ const DataBricks = ({
                 </div>
               );
             })}
-          </div>
-          <div className="flex gap-2 mt-2">
+          </CardContent>
+          <CardFooter className="flex gap-2">
             <Button
               variant="destructive"
               onClick={() =>
@@ -118,13 +116,19 @@ const DataBricks = ({
               Remove
             </Button>
             <Button
-              onClick={() => toggleVisibility(item.id)}
+              onClick={() =>
+                setFilteredItems((prev) =>
+                  prev.map((i) =>
+                    i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
+                  )
+                )
+              }
               className="bg-blue-500"
             >
               {item.isHidden ? "Show" : "Hide"}
             </Button>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </motion.div>
     ));
 
@@ -173,6 +177,5 @@ const DataBricks = ({
     </div>
   );
 };
-
 
 export default DataBricks;
