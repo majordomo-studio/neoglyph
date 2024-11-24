@@ -76,100 +76,102 @@ const DataBricks = ({
   };
 
   const renderItems = () =>
-    filteredItems.map((item) => (
-      <motion.div
-        key={item.id}
-        variants={itemVariants}
-        initial="hidden"
-        animate={!item.isHidden ? "visible" : "hidden"}
-        exit="exit"
-        layout
-        className={cn(
-          layoutMode === "masonry" && "w-full",
-          layoutMode === "fit-rows" && "w-full",
-          layoutMode === "vertical" && "w-full",
-          "aspect-square" // Ensure each card is a square
-        )}
-      >
-        <Card className="shadow relative h-full">
-          {/* Icons in the top-right corner */}
-          <div className="absolute top-2 right-2 flex gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Trash
-                    className="cursor-pointer text-red-500 hover:text-red-700"
-                    onClick={() =>
-                      setFilteredItems((prev) =>
-                        prev.filter((i) => i.id !== item.id)
-                      )
-                    }
-                    size={20}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>Remove Item</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  {item.isHidden ? (
-                    <Eye
-                      className="cursor-pointer text-blue-500 hover:text-blue-700"
+    filteredItems
+      .filter((item) => !item.isHidden) // Exclude hidden items from rendering
+      .map((item) => (
+        <motion.div
+          key={item.id}
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          layout
+          className={cn(
+            layoutMode === "masonry" && "w-full",
+            layoutMode === "fit-rows" && "w-full",
+            layoutMode === "vertical" && "w-full",
+            "aspect-square" // Ensure each card is a square
+          )}
+        >
+          <Card className="shadow relative h-full">
+            {/* Icons in the top-right corner */}
+            <div className="absolute top-2 right-2 flex gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Trash
+                      className="cursor-pointer text-red-500 hover:text-red-700"
                       onClick={() =>
                         setFilteredItems((prev) =>
-                          prev.map((i) =>
-                            i.id === item.id
-                              ? { ...i, isHidden: !i.isHidden }
-                              : i
-                          )
+                          prev.filter((i) => i.id !== item.id)
                         )
                       }
                       size={20}
                     />
-                  ) : (
-                    <EyeOff
-                      className="cursor-pointer text-blue-500 hover:text-blue-700"
-                      onClick={() =>
-                        setFilteredItems((prev) =>
-                          prev.map((i) =>
-                            i.id === item.id
-                              ? { ...i, isHidden: !i.isHidden }
-                              : i
-                          )
-                        )
-                      }
-                      size={20}
-                    />
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>
-                  {item.isHidden ? "Show Item" : "Hide Item"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Remove Item</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-          <CardHeader>
-            <CardTitle>{item.title}</CardTitle>
-            <CardDescription>{item.description}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {Object.entries(item).map(([key, value]) => {
-              if (["id", "title", "description", "category", "isHidden"].includes(key)) {
-                return null;
-              }
-              return (
-                <div key={key} className={`${key}_field text-sm text-gray-600`}>
-                  <span className="font-medium">{formatKey(key)}:</span> {value}
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      </motion.div>
-    ));
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    {item.isHidden ? (
+                      <Eye
+                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+                        onClick={() =>
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id
+                                ? { ...i, isHidden: !i.isHidden }
+                                : i
+                            )
+                          )
+                        }
+                        size={20}
+                      />
+                    ) : (
+                      <EyeOff
+                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+                        onClick={() =>
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id
+                                ? { ...i, isHidden: !i.isHidden }
+                                : i
+                            )
+                          )
+                        }
+                        size={20}
+                      />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {item.isHidden ? "Show Item" : "Hide Item"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <CardHeader>
+              <CardTitle>{item.title}</CardTitle>
+              <CardDescription>{item.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {Object.entries(item).map(([key, value]) => {
+                if (["id", "title", "description", "category", "isHidden"].includes(key)) {
+                  return null;
+                }
+                return (
+                  <div key={key} className={`${key}_field text-sm text-gray-600`}>
+                    <span className="font-medium">{formatKey(key)}:</span> {value}
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </motion.div>
+      ));
 
   return (
     <div className="flex flex-col gap-4">
@@ -194,6 +196,7 @@ const DataBricks = ({
 
       <AnimatePresence>
         <motion.div
+          layout // Enable layout animations for the grid
           className={cn(
             "grid gap-4",
             layoutMode === "masonry" &&
@@ -204,11 +207,6 @@ const DataBricks = ({
           style={{
             gridAutoRows: layoutMode === "masonry" ? "masonry" : "auto",
           }}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={containerVariants}
-          transition={{ duration: transitionDuration / 1000 }}
         >
           {renderItems()}
         </motion.div>
