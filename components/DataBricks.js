@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
+import { Trash, Eye, EyeOff } from "lucide-react"; // Import Lucide icons
 import { cn } from "@/lib/utils";
 
 const itemVariants = {
@@ -89,7 +90,44 @@ const DataBricks = ({
           layoutMode === "vertical" && "w-full"
         )}
       >
-        <Card className="shadow">
+        <Card className="shadow relative">
+          {/* Icons in the top-right corner */}
+          <div className="absolute top-2 right-2 flex gap-2">
+            {/* Remove Icon */}
+            <Trash
+              className="cursor-pointer text-red-500 hover:text-red-700"
+              onClick={() =>
+                setFilteredItems((prev) => prev.filter((i) => i.id !== item.id))
+              }
+              size={20}
+            />
+            {/* Hide/Show Icon */}
+            {item.isHidden ? (
+              <Eye
+                className="cursor-pointer text-blue-500 hover:text-blue-700"
+                onClick={() =>
+                  setFilteredItems((prev) =>
+                    prev.map((i) =>
+                      i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
+                    )
+                  )
+                }
+                size={20}
+              />
+            ) : (
+              <EyeOff
+                className="cursor-pointer text-blue-500 hover:text-blue-700"
+                onClick={() =>
+                  setFilteredItems((prev) =>
+                    prev.map((i) =>
+                      i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
+                    )
+                  )
+                }
+                size={20}
+              />
+            )}
+          </div>
           <CardHeader>
             <CardTitle>{item.title}</CardTitle>
             <CardDescription>{item.description}</CardDescription>
@@ -106,28 +144,6 @@ const DataBricks = ({
               );
             })}
           </CardContent>
-          <CardFooter className="flex gap-2">
-            <Button
-              variant="destructive"
-              onClick={() =>
-                setFilteredItems((prev) => prev.filter((i) => i.id !== item.id))
-              }
-            >
-              Remove
-            </Button>
-            <Button
-              onClick={() =>
-                setFilteredItems((prev) =>
-                  prev.map((i) =>
-                    i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
-                  )
-                )
-              }
-              className="bg-blue-500"
-            >
-              {item.isHidden ? "Show" : "Hide"}
-            </Button>
-          </CardFooter>
         </Card>
       </motion.div>
     ));
