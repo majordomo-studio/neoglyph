@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react"; // Add Maximize2 icon
+import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const itemVariants = {
@@ -77,136 +77,162 @@ const DataBricks = ({
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
 
+  const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
+  const keyValuePairs = Object.entries(item).filter(
+    ([key]) => !["id", "title", "description", "category", "isHidden"].includes(key)
+  );
+
+  const firstColumn = keyValuePairs.slice(0, 6);
+  const secondColumn = keyValuePairs.slice(
+    8,
+    isLargeSize ? 20 : isFullWidth ? keyValuePairs.length : 0
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col space-y-2">
+        {firstColumn.map(([key, value]) => (
+          <div key={key} className={`${key}_field text-sm text-gray-600`}>
+            <span className="font-medium">{formatKey(key)}:</span> {value}
+          </div>
+        ))}
+      </div>
+      {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
+        <div className="flex flex-col space-y-2">
+          {secondColumn.map(([key, value]) => (
+            <div key={key} className={`${key}_field text-sm text-gray-600`}>
+              <span className="font-medium">{formatKey(key)}:</span> {value}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
   const renderItems = () =>
     filteredItems
       .filter((item) => !item.isHidden) // Exclude hidden items from rendering
-      .map((item) => (
-        <motion.div
-          key={item.id}
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          layout
-          onClick={() => {
-            // Handle double-size functionality on click
-            if (fullWidthCardId !== item.id) {
-              setSelectedCardId((prevId) =>
-                prevId === item.id ? null : item.id
-              );
-            }
-          }}
-          className={cn(
-            "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
-            layoutMode === "masonry" && "w-full",
-            layoutMode === "fit-rows" && "w-full",
-            layoutMode === "vertical" && "w-full",
-            selectedCardId === item.id && "scale-[2] col-span-2 row-span-2", // Double size if clicked
-            fullWidthCardId === item.id &&
-              "col-span-full row-span-full w-full aspect-square" // Full width if maximized
-          )}
-        >
-          <Card className="shadow relative h-full">
-            {/* Icons in the top-right corner */}
-            <div className="absolute top-2 right-2 flex gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Trash
-                      className="cursor-pointer text-red-500 hover:text-red-700"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent click event bubbling
-                        setFilteredItems((prev) =>
-                          prev.filter((i) => i.id !== item.id)
-                        );
-                      }}
-                      size={20}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>Remove Item</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+      .map((item) => {
+        const isSelected = selectedCardId === item.id;
+        const isFullWidth = fullWidthCardId === item.id;
+        const isLargeSize = isSelected && !isFullWidth;
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    {item.isHidden ? (
-                      <Eye
-                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+        return (
+          <motion.div
+            key={item.id}
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            layout
+            onClick={() => {
+              if (!isFullWidth) {
+                setSelectedCardId((prevId) => (prevId === item.id ? null : item.id));
+              }
+            }}
+            className={cn(
+              "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
+              layoutMode === "masonry" && "w-full",
+              layoutMode === "fit-rows" && "w-full",
+              layoutMode === "vertical" && "w-full",
+              isSelected && "scale-[2] col-span-2 row-span-2", // Double size if clicked
+              isFullWidth && "col-span-full row-span-full w-full aspect-square" // Full width if maximized
+            )}
+          >
+            <Card className="shadow relative h-full">
+              {/* Icons in the top-right corner */}
+              <div className="absolute top-2 right-2 flex gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Trash
+                        className="cursor-pointer text-red-500 hover:text-red-700"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent click event bubbling
                           setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, isHidden: !i.isHidden }
-                                : i
-                            )
+                            prev.filter((i) => i.id !== item.id)
                           );
                         }}
                         size={20}
                       />
-                    ) : (
-                      <EyeOff
-                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+                    </TooltipTrigger>
+                    <TooltipContent>Remove Item</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {item.isHidden ? (
+                        <Eye
+                          className="cursor-pointer text-blue-500 hover:text-blue-700"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent click event bubbling
+                            setFilteredItems((prev) =>
+                              prev.map((i) =>
+                                i.id === item.id
+                                  ? { ...i, isHidden: !i.isHidden }
+                                  : i
+                              )
+                            );
+                          }}
+                          size={20}
+                        />
+                      ) : (
+                        <EyeOff
+                          className="cursor-pointer text-blue-500 hover:text-blue-700"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent click event bubbling
+                            setFilteredItems((prev) =>
+                              prev.map((i) =>
+                                i.id === item.id
+                                  ? { ...i, isHidden: !i.isHidden }
+                                  : i
+                              )
+                            );
+                          }}
+                          size={20}
+                        />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {item.isHidden ? "Show Item" : "Hide Item"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Maximize2
+                        className="cursor-pointer text-green-500 hover:text-green-700"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, isHidden: !i.isHidden }
-                                : i
-                            )
+                          setFullWidthCardId((prevId) =>
+                            prevId === item.id ? null : item.id
                           );
+                          setSelectedCardId(null); // Clear double-size state
                         }}
                         size={20}
                       />
-                    )}
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {item.isHidden ? "Show Item" : "Hide Item"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                    </TooltipTrigger>
+                    <TooltipContent>Maximize Item</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Maximize2
-                      className="cursor-pointer text-green-500 hover:text-green-700"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent click event bubbling
-                        setFullWidthCardId((prevId) =>
-                          prevId === item.id ? null : item.id
-                        );
-                        setSelectedCardId(null); // Clear double-size state
-                      }}
-                      size={20}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>Maximize Item</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-
-            <CardHeader>
-              <CardTitle>{item.title}</CardTitle>
-              <CardDescription>{item.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {Object.entries(item).map(([key, value]) => {
-                if (["id", "title", "description", "category", "isHidden"].includes(key)) {
-                  return null;
-                }
-                return (
-                  <div key={key} className={`${key}_field text-sm text-gray-600`}>
-                    <span className="font-medium">{formatKey(key)}:</span> {value}
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </motion.div>
-      ));
+              <CardHeader>
+                <CardTitle>{item.title}</CardTitle>
+                <CardDescription>{item.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {renderKeyValuePairs(item, isFullWidth, isLargeSize)}
+              </CardContent>
+            </Card>
+          </motion.div>
+        );
+      });
 
   return (
     <div className="flex flex-col gap-4">
