@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge"; 
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -93,15 +94,42 @@ const DataBricks = ({
       <div className="flex flex-col space-y-2">
         {firstColumn.map(([key, value]) => (
           <div key={key} className={`${key}_field text-sm text-gray-600`}>
-            <span className="font-medium">{formatKey(key)}:</span> {value}
+            <span className="font-medium">{formatKey(key)}:</span>
+            {key === "tags" && Array.isArray(value) ? (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {value.map((tag, index) => (
+                  <Badge key={index} className="capitalize">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <span> {value}</span>
+            )}
           </div>
         ))}
       </div>
       {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
-        <div className="flex flex-col space-y-2 ml-[170px]">
+        <div
+          className={cn(
+            "flex flex-col space-y-2",
+            isFullWidth ? "ml-[30vw] is-full-width" : "ml-[150px] is-large"
+          )}
+        >
           {secondColumn.map(([key, value]) => (
             <div key={key} className={`${key}_field text-sm text-gray-600`}>
-              <span className="font-medium">{formatKey(key)}:</span> {value}
+              <span className="font-medium">{formatKey(key)}:</span>
+              {key === "tags" && Array.isArray(value) ? (
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {value.map((tag, index) => (
+                    <Badge key={index} className="capitalize">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <span> {value}</span>
+              )}
             </div>
           ))}
         </div>
