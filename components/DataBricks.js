@@ -113,7 +113,7 @@ const DataBricks = ({
         <div
           className={cn(
             "flex flex-col space-y-2",
-            isFullWidth ? "ml-[30vw] is-full-width" : "ml-[150px] is-large"
+            isFullWidth ? "ml-[25vw] is-full-width" : "ml-[120px] is-large"
           )}
         >
           {secondColumn.map(([key, value]) => (
