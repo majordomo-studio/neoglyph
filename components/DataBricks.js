@@ -98,7 +98,7 @@ const DataBricks = ({
         ))}
       </div>
       {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-2 ml-[170px]">
           {secondColumn.map(([key, value]) => (
             <div key={key} className={`${key}_field text-sm text-gray-600`}>
               <span className="font-medium">{formatKey(key)}:</span> {value}
@@ -142,7 +142,7 @@ const DataBricks = ({
           >
             <Card className="shadow relative h-full">
               {/* Icons in the top-right corner */}
-              <div className="absolute top-2 right-2 flex gap-2">
+              <div className="absolute top-5 right-5 flex gap-2">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
