@@ -334,7 +334,7 @@ const DataBricks = ({
         <div
           className={cn(
             layoutMode === "masonry"
-              ? "grid gap-4 grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))]"
+              ? "grid gap-4 grid-cols-[repeat(auto-fit,_minmax(275px,_1fr))]"
               : "relative h-screen"
           )}
         >
