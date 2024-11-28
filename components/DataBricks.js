@@ -32,8 +32,26 @@ const containerVariants = {
 };
 
 const getFilterTest = (filter) => {
-  if (typeof filter === "function") return filter;
-  return (item) => item.category === filter || filter === "*";
+  // If the filter is "*" or empty, show all items
+  if (!filter || filter.trim() === "*" || filter.trim() === "") {
+    return () => true;
+  }
+
+  const lowerCaseFilter = filter.toLowerCase();
+
+  return (item) => {
+    // Search across all fields, including key-value pairs
+    return Object.values(item).some((value) => {
+      if (Array.isArray(value)) {
+        // If the value is an array (e.g., tags), check if any of the elements match the filter
+        return value.some((arrayItem) =>
+          String(arrayItem).toLowerCase().includes(lowerCaseFilter)
+        );
+      }
+      // Convert non-array values to strings and check if they include the filter
+      return String(value).toLowerCase().includes(lowerCaseFilter);
+    });
+  };
 };
 
 const getItemSorter = (sortHistory, sortAsc = true) => (a, b) => {
@@ -261,7 +279,7 @@ const DataBricks = ({
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
         <Input
-          placeholder="Filter by category"
+          placeholder="Search"
           value={categoryFilter === "*" ? "" : categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value || "*")}
           className="w-full max-w-sm"

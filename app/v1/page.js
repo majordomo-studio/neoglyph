@@ -1,262 +1,35 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DataBricks from "@/components/DataBricks";
-
-const data = [
-  {
-    "id": 1,
-    "title": "Item 1",
-    "description": "This is a square card.",
-    "category": "A",
-    "size": "square",
-    "color": "red",
-    "price": 10.99,
-    "rating": 4.5,
-    "stock": 20,
-    "tags": ["card", "square", "red"],
-    "material": "paper",
-    "created_at": "2023-01-01",
-    "updated_at": "2023-01-15",
-    "brand": "Generic",
-    "weight": "200g",
-    "dimensions": "10x10",
-    "is_featured": true,
-    "is_discounted": false,
-    "discount_percent": 0,
-    "shipping_cost": 3.99,
-    "sku": "ITEM1-SQ",
-    "seller": "Store A",
-    "location": "Warehouse A",
-    "popularity": 88,
-    "is_returnable": true,
-    "views": 150,
-    "likes": 45
-  },
-  {
-    "id": 2,
-    "title": "Item 2",
-    "description": "This is a wide card.",
-    "category": "B",
-    "size": "wide",
-    "color": "blue",
-    "price": 12.99,
-    "rating": 4.0,
-    "stock": 15,
-    "tags": ["card", "wide", "blue"],
-    "material": "plastic",
-    "created_at": "2023-02-01",
-    "updated_at": "2023-02-10",
-    "brand": "Premium",
-    "weight": "300g",
-    "dimensions": "20x10",
-    "is_featured": false,
-    "is_discounted": true,
-    "discount_percent": 10,
-    "shipping_cost": 5.99,
-    "sku": "ITEM2-WD",
-    "seller": "Store B",
-    "location": "Warehouse B",
-    "popularity": 75,
-    "is_returnable": true,
-    "views": 120,
-    "likes": 30
-  },
-  {
-    "id": 3,
-    "title": "Item 3",
-    "description": "This is a tall card.",
-    "category": "A",
-    "size": "tall",
-    "color": "green",
-    "price": 9.99,
-    "rating": 3.8,
-    "stock": 25,
-    "tags": ["card", "tall", "green"],
-    "material": "cardboard",
-    "created_at": "2023-03-01",
-    "updated_at": "2023-03-15",
-    "brand": "Eco",
-    "weight": "250g",
-    "dimensions": "10x20",
-    "is_featured": true,
-    "is_discounted": false,
-    "discount_percent": 0,
-    "shipping_cost": 4.99,
-    "sku": "ITEM3-TL",
-    "seller": "Store A",
-    "location": "Warehouse C",
-    "popularity": 82,
-    "is_returnable": true,
-    "views": 200,
-    "likes": 60
-  },
-  {
-    "id": 4,
-    "title": "Item 4",
-    "description": "This is a square card.",
-    "category": "C",
-    "size": "square",
-    "color": "yellow",
-    "price": 11.99,
-    "rating": 4.3,
-    "stock": 30,
-    "tags": ["card", "square", "yellow"],
-    "material": "metal",
-    "created_at": "2023-04-01",
-    "updated_at": "2023-04-20",
-    "brand": "Luxury",
-    "weight": "150g",
-    "dimensions": "10x10",
-    "is_featured": false,
-    "is_discounted": true,
-    "discount_percent": 15,
-    "shipping_cost": 3.49,
-    "sku": "ITEM4-SQ",
-    "seller": "Store C",
-    "location": "Warehouse D",
-    "popularity": 90,
-    "is_returnable": false,
-    "views": 300,
-    "likes": 70
-  },
-  {
-    "id": 5,
-    "title": "Item 5",
-    "description": "Another wide card.",
-    "category": "A",
-    "size": "wide",
-    "color": "orange",
-    "price": 14.99,
-    "rating": 4.7,
-    "stock": 18,
-    "tags": ["card", "wide", "orange"],
-    "material": "glass",
-    "created_at": "2023-05-01",
-    "updated_at": "2023-05-10",
-    "brand": "Standard",
-    "weight": "350g",
-    "dimensions": "30x15",
-    "is_featured": true,
-    "is_discounted": false,
-    "discount_percent": 0,
-    "shipping_cost": 6.99,
-    "sku": "ITEM5-WD",
-    "seller": "Store D",
-    "location": "Warehouse E",
-    "popularity": 95,
-    "is_returnable": true,
-    "views": 250,
-    "likes": 80
-  },
-  {
-    "id": 6,
-    "title": "Item 6",
-    "description": "Another tall card.",
-    "category": "B",
-    "size": "tall",
-    "color": "purple",
-    "price": 13.99,
-    "rating": 3.9,
-    "stock": 10,
-    "tags": ["card", "tall", "purple"],
-    "material": "plastic",
-    "created_at": "2023-06-01",
-    "updated_at": "2023-06-15",
-    "brand": "Budget",
-    "weight": "300g",
-    "dimensions": "15x25",
-    "is_featured": false,
-    "is_discounted": true,
-    "discount_percent": 20,
-    "shipping_cost": 5.49,
-    "sku": "ITEM6-TL",
-    "seller": "Store E",
-    "location": "Warehouse F",
-    "popularity": 65,
-    "is_returnable": true,
-    "views": 100,
-    "likes": 20
-  },
-  {
-    "id": 7,
-    "title": "Item 7",
-    "description": "Another square card.",
-    "category": "A",
-    "size": "square",
-    "color": "teal",
-    "price": 8.99,
-    "rating": 4.2,
-    "stock": 22,
-    "tags": ["card", "square", "teal"],
-    "material": "ceramic",
-    "created_at": "2023-07-01",
-    "updated_at": "2023-07-10",
-    "brand": "Handmade",
-    "weight": "400g",
-    "dimensions": "12x12",
-    "is_featured": true,
-    "is_discounted": true,
-    "discount_percent": 25,
-    "shipping_cost": 4.49,
-    "sku": "ITEM7-SQ",
-    "seller": "Store F",
-    "location": "Warehouse G",
-    "popularity": 87,
-    "is_returnable": false,
-    "views": 180,
-    "likes": 55
-  },
-  {
-    "id": 8,
-    "title": "Item 8",
-    "description": "A tall card with more details.",
-    "category": "C",
-    "size": "tall",
-    "color": "black",
-    "price": 16.99,
-    "rating": 4.6,
-    "stock": 12,
-    "tags": ["card", "tall", "black"],
-    "material": "steel",
-    "created_at": "2023-08-01",
-    "updated_at": "2023-08-20",
-    "brand": "Industrial",
-    "weight": "500g",
-    "dimensions": "25x35",
-    "is_featured": false,
-    "is_discounted": false,
-    "discount_percent": 0,
-    "shipping_cost": 7.99,
-    "sku": "ITEM8-TL",
-    "seller": "Store G",
-    "location": "Warehouse H",
-    "popularity": 91,
-    "is_returnable": true,
-    "views": 400,
-    "likes": 100
-  }
-]
-;
-
+import { fetchData } from "@/api/dataAPI";
 
 export default function Home() {
-  const [items, setItems] = useState(data);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchData();
+        setItems(data);
+      } catch (error) {
+        console.error("Failed to load data:", error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full">
-
         <div className="w-full">
           <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
             DataBricks Demo
           </h1>
           <DataBricks items={items} layoutMode="masonry" />
         </div>
-
       </main>
-
     </div>
   );
 }
