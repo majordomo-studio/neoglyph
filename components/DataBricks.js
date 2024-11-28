@@ -260,13 +260,16 @@ const DataBricks = ({
                 <Tooltip>
                   <TooltipTrigger>
                     <Maximize2
-                      className="cursor-pointer text-green-500 hover:text-green-700"
+                      className={cn(
+                        "cursor-pointer text-green-500 hover:text-green-700",
+                        layoutMode === "vertical" && "hidden"
+                      )}
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent click event bubbling
+                        e.stopPropagation();
                         setFullWidthCardId((prevId) =>
                           prevId === item.id ? null : item.id
                         );
-                        setSelectedCardId(null); // Clear double-size state
+                        setSelectedCardId(null);
                       }}
                       size={20}
                     />
