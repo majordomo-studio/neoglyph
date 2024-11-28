@@ -13,6 +13,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 const itemVariants = {
@@ -63,6 +74,8 @@ const DataBricks = ({
   const [layoutMode, setLayoutMode] = useState("masonry");
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [fullWidthCardId, setFullWidthCardId] = useState(null);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState(null);
 
   useEffect(() => {
     const filterTest = getFilterTest(categoryFilter);
@@ -104,10 +117,16 @@ const DataBricks = ({
     }
   };
 
-  const handleDeleteCard = async (id) => {
-    // Simulate an API call for deletion
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setFilteredItems((prev) => prev.filter((item) => item.id !== id));
+  const confirmDeleteCard = (id) => {
+    setAlertDialogOpen(true);
+    setCardToDelete(id);
+  };
+
+  const handleDeleteCard = async () => {
+    setAlertDialogOpen(false); // Close the dialog
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+    setFilteredItems((prev) => prev.filter((item) => item.id !== cardToDelete));
+    setCardToDelete(null); // Clear the card to delete
   };
 
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
@@ -187,7 +206,7 @@ const DataBricks = ({
                       className="cursor-pointer text-red-500 hover:text-red-700"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteCard(item.id);
+                        confirmDeleteCard(item.id);
                       }}
                       size={20}
                     />
@@ -311,6 +330,21 @@ const DataBricks = ({
           {renderItems()}
         </div>
       </AnimatePresence>
+
+      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this item? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCard}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
