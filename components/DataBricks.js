@@ -33,6 +33,7 @@ const itemVariants = {
 };
 
 const getFilterTest = (filter) => {
+  // If the filter is "*" or empty, show all items
   if (!filter || filter.trim() === "*" || filter.trim() === "") {
     return () => true;
   }
@@ -40,12 +41,15 @@ const getFilterTest = (filter) => {
   const lowerCaseFilter = filter.toLowerCase();
 
   return (item) => {
+    // Search across all fields, including key-value pairs
     return Object.values(item).some((value) => {
       if (Array.isArray(value)) {
+        // If the value is an array (e.g., tags), check if any of the elements match the filter
         return value.some((arrayItem) =>
           String(arrayItem).toLowerCase().includes(lowerCaseFilter)
         );
       }
+      // Convert non-array values to strings and check if they include the filter
       return String(value).toLowerCase().includes(lowerCaseFilter);
     });
   };
@@ -131,7 +135,7 @@ const DataBricks = ({
 
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = Object.entries(item).filter(
-      ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key)
+      ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key) // Exclude "tags"
     );
 
     const firstColumn = keyValuePairs.slice(0, 5);
@@ -189,11 +193,11 @@ const DataBricks = ({
               : {}
           }
           className={cn(
-            "aspect-square cursor-pointer",
+            "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
             layoutMode === "masonry" && "w-full",
             layoutMode === "vertical" && "w-full col-span-full row-span-full aspect-square",
-            isSelected && "scale-[2] col-span-2 row-span-2",
-            isFullWidth && "col-span-full row-span-full w-full aspect-square"
+            isSelected && "scale-[2] col-span-2 row-span-2", // Double size if clicked
+            isFullWidth && "col-span-full row-span-full w-full aspect-square" // Full width if maximized
           )}
           onClick={() => handleCardClick(item.id)}
         >
@@ -205,7 +209,7 @@ const DataBricks = ({
                     <Trash
                       className="cursor-pointer text-red-500 hover:text-red-700"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent click event bubbling
                         confirmDeleteCard(item.id);
                       }}
                       size={20}
@@ -222,7 +226,7 @@ const DataBricks = ({
                       <Eye
                         className="cursor-pointer text-blue-500 hover:text-blue-700"
                         onClick={(e) => {
-                          e.stopPropagation();
+                          e.stopPropagation(); // Prevent click event bubbling
                           setFilteredItems((prev) =>
                             prev.map((i) =>
                               i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
@@ -235,7 +239,7 @@ const DataBricks = ({
                       <EyeOff
                         className="cursor-pointer text-blue-500 hover:text-blue-700"
                         onClick={(e) => {
-                          e.stopPropagation();
+                          e.stopPropagation(); // Prevent click event bubbling
                           setFilteredItems((prev) =>
                             prev.map((i) =>
                               i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
@@ -258,11 +262,11 @@ const DataBricks = ({
                     <Maximize2
                       className="cursor-pointer text-green-500 hover:text-green-700"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent click event bubbling
                         setFullWidthCardId((prevId) =>
                           prevId === item.id ? null : item.id
                         );
-                        setSelectedCardId(null);
+                        setSelectedCardId(null); // Clear double-size state
                       }}
                       size={20}
                     />
