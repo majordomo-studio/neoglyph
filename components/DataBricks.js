@@ -265,11 +265,11 @@ const DataBricks = ({
                         layoutMode === "vertical" && "hidden"
                       )}
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent click event bubbling
                         setFullWidthCardId((prevId) =>
                           prevId === item.id ? null : item.id
                         );
-                        setSelectedCardId(null);
+                        setSelectedCardId(null); // Clear double-size state
                       }}
                       size={20}
                     />
