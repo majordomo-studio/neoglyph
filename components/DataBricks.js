@@ -141,7 +141,7 @@ const DataBricks = ({
     const firstColumn = keyValuePairs.slice(0, 5);
     const secondColumn = keyValuePairs.slice(
       5,
-      isLargeSize ? 20 : isFullWidth ? keyValuePairs.length : 0
+      isLargeSize ? 18 : isFullWidth ? keyValuePairs.length : 0
     );
 
     return (
@@ -289,8 +289,12 @@ const DataBricks = ({
             {item.tags && Array.isArray(item.tags) && (
               <CardFooter
                 className={cn(
-                  "flex flex-wrap gap-2",
-                  isFullWidth ? "mt-16" : isLargeSize ? "mt-12" : "mt-4"
+                  "absolute flex flex-wrap gap-2",
+                  isFullWidth
+                    ? "bottom-8 left-8"
+                    : isLargeSize
+                    ? "bottom-0 left-0"
+                    : "left-0 bottom-0"
                 )}
               >
                 {item.tags.map((tag, index) => (
