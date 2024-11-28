@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,6 @@ const itemVariants = {
 };
 
 const getFilterTest = (filter) => {
-  // If the filter is "*" or empty, show all items
   if (!filter || filter.trim() === "*" || filter.trim() === "") {
     return () => true;
   }
@@ -30,15 +29,12 @@ const getFilterTest = (filter) => {
   const lowerCaseFilter = filter.toLowerCase();
 
   return (item) => {
-    // Search across all fields, including key-value pairs
     return Object.values(item).some((value) => {
       if (Array.isArray(value)) {
-        // If the value is an array (e.g., tags), check if any of the elements match the filter
         return value.some((arrayItem) =>
           String(arrayItem).toLowerCase().includes(lowerCaseFilter)
         );
       }
-      // Convert non-array values to strings and check if they include the filter
       return String(value).toLowerCase().includes(lowerCaseFilter);
     });
   };
@@ -108,9 +104,15 @@ const DataBricks = ({
     }
   };
 
+  const handleDeleteCard = async (id) => {
+    // Simulate an API call for deletion
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    setFilteredItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = Object.entries(item).filter(
-      ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key) // Exclude "tags"
+      ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key)
     );
 
     const firstColumn = keyValuePairs.slice(0, 5);
@@ -149,131 +151,133 @@ const DataBricks = ({
   };
 
   const renderItems = () =>
-    filteredItems
-      .filter((item) => !item.isHidden) // Exclude hidden items from rendering
-      .map((item, index) => {
-        const isSelected = selectedCardId === item.id;
-        const isFullWidth = fullWidthCardId === item.id || layoutMode === "vertical";
-        const isLargeSize = isSelected && !isFullWidth;
+    filteredItems.map((item, index) => {
+      const isSelected = selectedCardId === item.id;
+      const isFullWidth = fullWidthCardId === item.id || layoutMode === "vertical";
+      const isLargeSize = isSelected && !isFullWidth;
 
-        return (
-          <motion.div
-            key={item.id}
-            layout
-            style={
-              layoutMode === "vertical"
-                ? { position: "absolute", top: `${index * 20}px`, zIndex: filteredItems.length - index }
-                : {}
-            }
-            className={cn(
-              "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
-              layoutMode === "masonry" && "w-full",
-              layoutMode === "vertical" && "w-full col-span-full row-span-full aspect-square",
-              isSelected && "scale-[2] col-span-2 row-span-2", // Double size if clicked
-              isFullWidth && "col-span-full row-span-full w-full aspect-square" // Full width if maximized
-            )}
-            onClick={() => handleCardClick(item.id)}
-          >
-            <Card className="shadow relative h-full">
-              <div className="absolute top-5 right-5 flex gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Trash
-                        className="cursor-pointer text-red-500 hover:text-red-700"
+      return (
+        <motion.div
+          key={item.id}
+          layout
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          style={
+            layoutMode === "vertical"
+              ? { position: "absolute", top: `${index * 20}px`, zIndex: filteredItems.length - index }
+              : {}
+          }
+          className={cn(
+            "aspect-square cursor-pointer",
+            layoutMode === "masonry" && "w-full",
+            layoutMode === "vertical" && "w-full col-span-full row-span-full aspect-square",
+            isSelected && "scale-[2] col-span-2 row-span-2",
+            isFullWidth && "col-span-full row-span-full w-full aspect-square"
+          )}
+          onClick={() => handleCardClick(item.id)}
+        >
+          <Card className="shadow relative h-full">
+            <div className="absolute top-5 right-5 flex gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Trash
+                      className="cursor-pointer text-red-500 hover:text-red-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCard(item.id);
+                      }}
+                      size={20}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Remove Item</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    {item.isHidden ? (
+                      <Eye
+                        className="cursor-pointer text-blue-500 hover:text-blue-700"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) => prev.filter((i) => i.id !== item.id));
-                        }}
-                        size={20}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>Remove Item</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      {item.isHidden ? (
-                        <Eye
-                          className="cursor-pointer text-blue-500 hover:text-blue-700"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent click event bubbling
-                            setFilteredItems((prev) =>
-                              prev.map((i) =>
-                                i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
-                              )
-                            );
-                          }}
-                          size={20}
-                        />
-                      ) : (
-                        <EyeOff
-                          className="cursor-pointer text-blue-500 hover:text-blue-700"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent click event bubbling
-                            setFilteredItems((prev) =>
-                              prev.map((i) =>
-                                i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
-                              )
-                            );
-                          }}
-                          size={20}
-                        />
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {item.isHidden ? "Show Item" : "Hide Item"}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Maximize2
-                        className="cursor-pointer text-green-500 hover:text-green-700"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFullWidthCardId((prevId) =>
-                            prevId === item.id ? null : item.id
+                          e.stopPropagation();
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
+                            )
                           );
-                          setSelectedCardId(null); // Clear double-size state
                         }}
                         size={20}
                       />
-                    </TooltipTrigger>
-                    <TooltipContent>Maximize Item</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+                    ) : (
+                      <EyeOff
+                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
+                            )
+                          );
+                        }}
+                        size={20}
+                      />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {item.isHidden ? "Show Item" : "Hide Item"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-              <CardHeader>
-                <CardTitle>{item.title}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 pb-1">
-                {renderKeyValuePairs(item, isFullWidth, isLargeSize)}
-              </CardContent>
-              {item.tags && Array.isArray(item.tags) && (
-                <CardFooter
-                  className={cn(
-                    "flex flex-wrap gap-2",
-                    isFullWidth ? "mt-16" : isLargeSize ? "mt-6" : "mt-4"
-                  )}
-                >
-                  {item.tags.map((tag, index) => (
-                    <Badge key={index} className="capitalize">
-                      {tag}
-                    </Badge>
-                  ))}
-                </CardFooter>
-              )}
-            </Card>
-          </motion.div>
-        );
-      });
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Maximize2
+                      className="cursor-pointer text-green-500 hover:text-green-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFullWidthCardId((prevId) =>
+                          prevId === item.id ? null : item.id
+                        );
+                        setSelectedCardId(null);
+                      }}
+                      size={20}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Maximize Item</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <CardHeader>
+              <CardTitle>{item.title}</CardTitle>
+              <CardDescription>{item.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 pb-1">
+              {renderKeyValuePairs(item, isFullWidth, isLargeSize)}
+            </CardContent>
+            {item.tags && Array.isArray(item.tags) && (
+              <CardFooter
+                className={cn(
+                  "flex flex-wrap gap-2",
+                  isFullWidth ? "mt-16" : isLargeSize ? "mt-12" : "mt-4"
+                )}
+              >
+                {item.tags.map((tag, index) => (
+                  <Badge key={index} className="capitalize">
+                    {tag}
+                  </Badge>
+                ))}
+              </CardFooter>
+            )}
+          </Card>
+        </motion.div>
+      );
+    });
 
   return (
     <div className="flex flex-col gap-4">
@@ -296,15 +300,17 @@ const DataBricks = ({
         </Button>
       </div>
 
-      <div
-        className={cn(
-          layoutMode === "masonry"
-            ? "grid gap-4 grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))]"
-            : "relative h-screen"
-        )}
-      >
-        {renderItems()}
-      </div>
+      <AnimatePresence>
+        <div
+          className={cn(
+            layoutMode === "masonry"
+              ? "grid gap-4 grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))]"
+              : "relative h-screen"
+          )}
+        >
+          {renderItems()}
+        </div>
+      </AnimatePresence>
     </div>
   );
 };
