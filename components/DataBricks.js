@@ -248,7 +248,7 @@ const DataBricks = ({
                       size={20}
                     />
                   </TooltipTrigger>
-                  <TooltipContent>Maximize Item</TooltipContent>
+                  <TooltipContent>Maximize</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
