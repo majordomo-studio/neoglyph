@@ -67,7 +67,10 @@ export default function DataGrid({ data = [], schema = null }) {
         header: ({ column }) => (
           <div
             className={`${
-              centerAlignedColumns.includes(key) ? 'text-center' : ''
+              centerAlignedColumns.includes(key) ||
+              typeof data[0]?.[key] === 'boolean'
+                ? 'text-center'
+                : ''
             }`}
           >
             {formatHeader(key)}
@@ -89,7 +92,7 @@ export default function DataGrid({ data = [], schema = null }) {
             );
           }
 
-          // Handle boolean values with icons
+          // Handle boolean values with icons and center alignment
           if (typeof value === 'boolean') {
             return (
               <div className="flex justify-center items-center">
@@ -107,10 +110,14 @@ export default function DataGrid({ data = [], schema = null }) {
             return <Badge>{value}</Badge>;
           }
 
+          // Center-align content if specified in schema or for boolean columns
           return (
             <div
               className={`${
-                centerAlignedColumns.includes(key) ? 'text-center' : ''
+                centerAlignedColumns.includes(key) ||
+                typeof data[0]?.[key] === 'boolean'
+                  ? 'text-center'
+                  : ''
               }`}
             >
               {value}
