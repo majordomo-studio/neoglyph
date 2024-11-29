@@ -28,6 +28,7 @@ export default function DataGridPage() {
           <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
             DataGrid Demo
           </h1>
+          {/* <DataGrid data={items} schema={schema} /> */}
           <DataGrid data={items} />
         </div>
       </main>
