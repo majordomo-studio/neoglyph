@@ -141,7 +141,7 @@ const DataBricks = ({
     const firstColumn = keyValuePairs.slice(0, 5);
     const secondColumn = keyValuePairs.slice(
       5,
-      isLargeSize ? 18 : isFullWidth ? keyValuePairs.length : 0
+      isLargeSize ? 20 : isFullWidth ? keyValuePairs.length : 0
     );
 
     return (
@@ -294,7 +294,7 @@ const DataBricks = ({
                     ? "bottom-8 left-8"
                     : isLargeSize
                     ? "bottom-0 left-0"
-                    : "left-0 bottom-0"
+                    : "bottom-[-5px] left-0"
                 )}
               >
                 {item.tags.map((tag, index) => (
