@@ -58,12 +58,21 @@ export default function DataGrid({ data = [], schema = null }) {
   const columns = React.useMemo(() => {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
     const badgeColumns = schema?.badgeColumns || []; // Add badgeColumns to schema
+    const centerAlignedColumns = schema?.centerAlignedColumns || []; // Add centerAlignedColumns to schema
 
     return [
       ...schemaColumns.map((key) => ({
         accessorKey: key, // Use the raw key for accessor
         id: key, // Match id to the raw key
-        header: formatHeader(key), // Format only for display
+        header: ({ column }) => (
+          <div
+            className={`${
+              centerAlignedColumns.includes(key) ? 'text-center' : ''
+            }`}
+          >
+            {formatHeader(key)}
+          </div>
+        ),
         cell: ({ row }) => {
           const value = row.getValue(key);
 
@@ -98,7 +107,15 @@ export default function DataGrid({ data = [], schema = null }) {
             return <Badge>{value}</Badge>;
           }
 
-          return <div>{value}</div>;
+          return (
+            <div
+              className={`${
+                centerAlignedColumns.includes(key) ? 'text-center' : ''
+              }`}
+            >
+              {value}
+            </div>
+          );
         },
       })),
       {
