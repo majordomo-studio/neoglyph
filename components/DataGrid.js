@@ -66,15 +66,45 @@ export default function DataGrid({ data = [], schema = null }) {
   const columns = React.useMemo(() => {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
     return [
-      ...schemaColumns.map((key) => ({
-        accessorKey: key,
-        header: ({ column }) => (
-          <div className="flex items-center space-x-2">
-            <span>{formatHeader(key)}</span>
-          </div>
-        ),
-        cell: ({ row }) => <div>{row.getValue(key)}</div>,
-      })),
+      ...schemaColumns.map((key) => {
+        // Special handling for the 'tags' key
+        if (key === "tags") {
+          return {
+            accessorKey: key,
+            header: ({ column }) => (
+              <div className="flex items-center space-x-2">
+                <span>{formatHeader(key)}</span>
+              </div>
+            ),
+            cell: ({ row }) => {
+              const tags = row.getValue(key);
+              if (Array.isArray(tags) && tags.length > 0) {
+                return (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <Badge key={index} className="capitalize">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                );
+              }
+              return <div>No Tags</div>;
+            },
+          };
+        }
+
+        // Default handling for other keys
+        return {
+          accessorKey: key,
+          header: ({ column }) => (
+            <div className="flex items-center space-x-2">
+              <span>{formatHeader(key)}</span>
+            </div>
+          ),
+          cell: ({ row }) => <div>{row.getValue(key)}</div>,
+        };
+      }),
       {
         id: "actions",
         cell: ({ row }) => (
