@@ -39,7 +39,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
-import { Check, X, MoreHorizontal } from 'lucide-react'; // Import icons
+import {
+  Check,
+  X,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react'; // Import icons
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -62,8 +70,8 @@ export default function DataGrid({ data = [], schema = null }) {
 
     return [
       ...schemaColumns.map((key) => ({
-        accessorKey: key, // Use the raw key for accessor
-        id: key, // Match id to the raw key
+        accessorKey: key,
+        id: key,
         header: ({ column }) => (
           <div
             className={`${
@@ -79,7 +87,6 @@ export default function DataGrid({ data = [], schema = null }) {
         cell: ({ row }) => {
           const value = row.getValue(key);
 
-          // Special handling for 'tags' key
           if (key === 'tags' && Array.isArray(value)) {
             return (
               <div className="flex flex-wrap gap-2">
@@ -92,7 +99,6 @@ export default function DataGrid({ data = [], schema = null }) {
             );
           }
 
-          // Handle boolean values with icons and center alignment
           if (typeof value === 'boolean') {
             return (
               <div className="flex justify-center items-center">
@@ -105,12 +111,10 @@ export default function DataGrid({ data = [], schema = null }) {
             );
           }
 
-          // Wrap values in a Badge if specified in schema.badgeColumns
           if (badgeColumns.includes(key)) {
             return <Badge>{value}</Badge>;
           }
 
-          // Center-align content if specified in schema or for boolean columns
           return (
             <div
               className={`${
@@ -178,7 +182,6 @@ export default function DataGrid({ data = [], schema = null }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  // Render toolbar for filtering and search
   const renderToolbar = () => {
     return (
       <div className="flex items-center justify-between mb-4">
@@ -186,7 +189,7 @@ export default function DataGrid({ data = [], schema = null }) {
           <Input
             placeholder="Search..."
             value={(() => {
-              const firstColumnId = table.getAllColumns()?.[0]?.id || ''; // Use the first column if available
+              const firstColumnId = table.getAllColumns()?.[0]?.id || '';
               return table.getColumn(firstColumnId)?.getFilterValue() || '';
             })()}
             onChange={(event) => {
@@ -200,12 +203,12 @@ export default function DataGrid({ data = [], schema = null }) {
           {schema?.filters?.map((key) => {
             const column = table
               .getAllColumns()
-              .find((col) => col.id === key || col.accessorKey === key); // Match against raw key
+              .find((col) => col.id === key || col.accessorKey === key);
             if (!column) {
               console.warn(
                 `The key "${key}" specified in schema.filters does not match any column.`
               );
-              return null; // Skip rendering the filter button for invalid keys
+              return null;
             }
             return (
               <DataTableFacetedFilter
@@ -281,43 +284,72 @@ export default function DataGrid({ data = [], schema = null }) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex items-center space-x-6">
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => table.setPageSize(Number(value))}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center space-x-6 lg:space-x-8">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Rows per page</p>
+            <Select
+              value={`${table.getState().pagination.pageSize}`}
+              onValueChange={(value) => table.setPageSize(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue
+                  placeholder={table.getState().pagination.pageSize}
+                />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+            Page {table.getState().pagination.pageIndex + 1} of{' '}
+            {table.getPageCount()}
+          </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
-              className="h-8 w-28 p-0"
-              onClick={() => table.previousPage()}
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              Prev
+              <span className="sr-only">Go to first page</span>
+              <ChevronsLeft />
             </Button>
             <Button
               variant="outline"
-              className="h-8 w-28 p-0"
+              className="h-8 w-8 p-0"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <span className="sr-only">Go to previous page</span>
+              <ChevronLeft />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              <span className="sr-only">Go to next page</span>
+              <ChevronRight />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <span className="sr-only">Go to last page</span>
+              <ChevronsRight />
             </Button>
           </div>
         </div>
