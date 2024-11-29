@@ -49,6 +49,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+// Helper function to format column headers
+const formatHeader = (key) => {
+  return key
+    .replace(/_/g, " ") // Replace underscores with spaces
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+};
+
 export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -63,7 +70,7 @@ export default function DataGrid({ data = [], schema = null }) {
         accessorKey: key,
         header: ({ column }) => (
           <div className="flex items-center space-x-2">
-            <span>{key}</span>
+            <span>{formatHeader(key)}</span>
           </div>
         ),
         cell: ({ row }) => <div>{row.getValue(key)}</div>,
