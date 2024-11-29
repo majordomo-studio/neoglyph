@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import DataBricks from "@/components/DataBricks";
 import { fetchData } from "@/api/dataAPI";
+import schema from "./schema";
 
 export default function Home() {
   const [items, setItems] = useState([]);
@@ -27,7 +28,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
             DataBricks Demo
           </h1>
-          <DataBricks items={items} layoutMode="masonry" />
+          <DataBricks items={items} layoutMode="masonry" schema={schema} />
         </div>
       </main>
     </div>

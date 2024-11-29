@@ -15,7 +15,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -71,6 +70,7 @@ const DataBricks = ({
   filter = "*",
   sortBy = ["original-order"],
   transitionDuration = 300,
+  schema = null, // Accept schema as a prop
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [sortHistory, setSortHistory] = useState(sortBy);
@@ -94,6 +94,17 @@ const DataBricks = ({
     return key
       .replace(/_/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const reorderKeys = (item, schema) => {
+    if (!schema || !schema.order) return Object.entries(item);
+    const orderedKeys = schema.order;
+    const keysSet = new Set(orderedKeys);
+
+    const knownKeys = orderedKeys.filter((key) => key in item);
+    const unknownKeys = Object.keys(item).filter((key) => !keysSet.has(key));
+
+    return [...knownKeys, ...unknownKeys].map((key) => [key, item[key]]);
   };
 
   const shuffleItems = () => {
@@ -134,7 +145,7 @@ const DataBricks = ({
   };
 
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
-    const keyValuePairs = Object.entries(item).filter(
+    const keyValuePairs = reorderKeys(item, schema).filter(
       ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key) // Exclude "tags"
     );
 
