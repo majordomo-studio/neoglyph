@@ -305,7 +305,7 @@ export default function DataGrid({ data = [], schema = null }) {
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
-              className="h-8 w-20 p-0"
+              className="h-8 w-28 p-0"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
@@ -313,7 +313,7 @@ export default function DataGrid({ data = [], schema = null }) {
             </Button>
             <Button
               variant="outline"
-              className="h-8 w-20 p-0"
+              className="h-8 w-28 p-0"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
