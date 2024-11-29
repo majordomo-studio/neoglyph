@@ -2,10 +2,6 @@
 
 import * as React from 'react';
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -35,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,14 +38,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 
-// Helper function to format column headers
+// Helper function to format column headers for display purposes
 const formatHeader = (key) => {
   return key
     .replace(/_/g, ' ') // Replace underscores with spaces
@@ -67,45 +57,29 @@ export default function DataGrid({ data = [], schema = null }) {
   const columns = React.useMemo(() => {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
     return [
-      ...schemaColumns.map((key) => {
-        // Special handling for the 'tags' key
-        if (key === 'tags') {
-          return {
-            accessorKey: key,
-            header: ({ column }) => (
-              <div className="flex items-center space-x-2">
-                <span>{formatHeader(key)}</span>
-              </div>
-            ),
-            cell: ({ row }) => {
-              const tags = row.getValue(key);
-              if (Array.isArray(tags) && tags.length > 0) {
-                return (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag, index) => (
-                      <Badge key={index} className="capitalize">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                );
-              }
-              return <div>No Tags</div>;
-            },
-          };
-        }
+      ...schemaColumns.map((key) => ({
+        accessorKey: key, // Use the raw key for accessor
+        id: key, // Match id to the raw key
+        header: formatHeader(key), // Format only for display
+        cell: ({ row }) => {
+          const value = row.getValue(key);
 
-        // Default handling for other keys
-        return {
-          accessorKey: key,
-          header: ({ column }) => (
-            <div className="flex items-center space-x-2">
-              <span>{formatHeader(key)}</span>
-            </div>
-          ),
-          cell: ({ row }) => <div>{row.getValue(key)}</div>,
-        };
-      }),
+          // Special handling for 'tags' key
+          if (key === 'tags' && Array.isArray(value)) {
+            return (
+              <div className="flex flex-wrap gap-2">
+                {value.map((tag, index) => (
+                  <Badge key={index} className="capitalize">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            );
+          }
+
+          return <div>{value}</div>;
+        },
+      })),
       {
         id: 'actions',
         cell: ({ row }) => (
@@ -114,13 +88,23 @@ export default function DataGrid({ data = [], schema = null }) {
               <Button
                 variant="ghost"
                 className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                aria-label="Open actions menu"
               >
                 Actions
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => console.log('Edit clicked for:', row.original)}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => console.log('Delete clicked for:', row.original)}
+              >
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ),
@@ -169,23 +153,28 @@ export default function DataGrid({ data = [], schema = null }) {
             className="h-8 w-[250px]"
           />
           {schema?.filters?.map((key) => {
-            const column = table.getColumn(key);
-            if (column) {
-              return (
-                <DataTableFacetedFilter
-                  key={key}
-                  column={column}
-                  title={formatHeader(key)}
-                  options={Array.from(
-                    column.getFacetedUniqueValues() || []
-                  ).map(([value]) => ({
+            const column = table
+              .getAllColumns()
+              .find((col) => col.id === key || col.accessorKey === key); // Match against raw key
+            if (!column) {
+              console.warn(
+                `The key "${key}" specified in schema.filters does not match any column.`
+              );
+              return null; // Skip rendering the filter button for invalid keys
+            }
+            return (
+              <DataTableFacetedFilter
+                key={key}
+                column={column}
+                title={formatHeader(key)}
+                options={Array.from(column.getFacetedUniqueValues() || []).map(
+                  ([value]) => ({
                     label: String(value),
                     value: String(value),
-                  }))}
-                />
-              );
-            }
-            return null;
+                  })
+                )}
+              />
+            );
           })}
         </div>
         <Button
