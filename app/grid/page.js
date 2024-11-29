@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import DataGrid from "@/components/DataGrid";
-import { fetchData } from "@/api/dataAPI";
-// import schema from "./schema";
+import React, { useEffect, useState } from 'react';
+import DataGrid from '@/components/DataGrid';
+import { fetchData } from '@/api/dataAPI';
+import schema from './schema';
 
 export default function DataGridPage() {
   const [items, setItems] = useState([]);
@@ -14,7 +14,7 @@ export default function DataGridPage() {
         const data = await fetchData();
         setItems(data);
       } catch (error) {
-        console.error("Failed to load data:", error);
+        console.error('Failed to load data:', error);
       }
     };
 
@@ -28,8 +28,7 @@ export default function DataGridPage() {
           <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
             DataGrid Demo
           </h1>
-          {/* <DataGrid data={items} schema={schema} /> */}
-          <DataGrid data={items} />
+          <DataGrid data={items} schema={schema} />
         </div>
       </main>
     </div>

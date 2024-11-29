@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -23,36 +23,37 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
+import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 
 // Helper function to format column headers
 const formatHeader = (key) => {
   return key
-    .replace(/_/g, " ") // Replace underscores with spaces
+    .replace(/_/g, ' ') // Replace underscores with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
 };
 
@@ -68,7 +69,7 @@ export default function DataGrid({ data = [], schema = null }) {
     return [
       ...schemaColumns.map((key) => {
         // Special handling for the 'tags' key
-        if (key === "tags") {
+        if (key === 'tags') {
           return {
             accessorKey: key,
             header: ({ column }) => (
@@ -106,7 +107,7 @@ export default function DataGrid({ data = [], schema = null }) {
         };
       }),
       {
-        id: "actions",
+        id: 'actions',
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -148,21 +149,45 @@ export default function DataGrid({ data = [], schema = null }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search..."
-          value={(() => {
-            const firstColumnId = table.getAllColumns()?.[0]?.id || ""; // Use the first column if available
-            return table.getColumn(firstColumnId)?.getFilterValue() || "";
-          })()}
-          onChange={(event) => {
-            const firstColumnId = table.getAllColumns()?.[0]?.id || "";
-            table.getColumn(firstColumnId)?.setFilterValue(event.target.value);
-          }}
-          className="h-8 w-[250px]"
-        />
+  // Render toolbar for filtering and search
+  const renderToolbar = () => {
+    return (
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search..."
+            value={(() => {
+              const firstColumnId = table.getAllColumns()?.[0]?.id || ''; // Use the first column if available
+              return table.getColumn(firstColumnId)?.getFilterValue() || '';
+            })()}
+            onChange={(event) => {
+              const firstColumnId = table.getAllColumns()?.[0]?.id || '';
+              table
+                .getColumn(firstColumnId)
+                ?.setFilterValue(event.target.value);
+            }}
+            className="h-8 w-[250px]"
+          />
+          {schema?.filters?.map((key) => {
+            const column = table.getColumn(key);
+            if (column) {
+              return (
+                <DataTableFacetedFilter
+                  key={key}
+                  column={column}
+                  title={formatHeader(key)}
+                  options={Array.from(
+                    column.getFacetedUniqueValues() || []
+                  ).map(([value]) => ({
+                    label: String(value),
+                    value: String(value),
+                  }))}
+                />
+              );
+            }
+            return null;
+          })}
+        </div>
         <Button
           variant="ghost"
           onClick={() => table.resetColumnFilters()}
@@ -171,6 +196,12 @@ export default function DataGrid({ data = [], schema = null }) {
           Reset Filters
         </Button>
       </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {renderToolbar()}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -194,7 +225,7 @@ export default function DataGrid({ data = [], schema = null }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -218,7 +249,7 @@ export default function DataGrid({ data = [], schema = null }) {
       </div>
       <div className="flex items-center justify-between">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center space-x-6">
@@ -227,9 +258,7 @@ export default function DataGrid({ data = [], schema = null }) {
             onValueChange={(value) => table.setPageSize(Number(value))}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue
-                placeholder={table.getState().pagination.pageSize}
-              />
+              <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (
