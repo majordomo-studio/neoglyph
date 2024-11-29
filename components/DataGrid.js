@@ -57,6 +57,8 @@ export default function DataGrid({ data = [], schema = null }) {
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
+    const badgeColumns = schema?.badgeColumns || []; // Add badgeColumns to schema
+
     return [
       ...schemaColumns.map((key) => ({
         accessorKey: key, // Use the raw key for accessor
@@ -89,6 +91,11 @@ export default function DataGrid({ data = [], schema = null }) {
                 )}
               </div>
             );
+          }
+
+          // Wrap values in a Badge if specified in schema.badgeColumns
+          if (badgeColumns.includes(key)) {
+            return <Badge>{value}</Badge>;
           }
 
           return <div>{value}</div>;
