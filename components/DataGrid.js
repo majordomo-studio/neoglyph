@@ -39,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
-import { Check, X } from 'lucide-react'; // Import icons
+import { Check, X, MoreHorizontal } from 'lucide-react'; // Import icons
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -135,7 +135,7 @@ export default function DataGrid({ data = [], schema = null }) {
                 className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
                 aria-label="Open actions menu"
               >
-                Actions
+                <MoreHorizontal className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
