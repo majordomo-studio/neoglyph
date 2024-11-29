@@ -33,8 +33,6 @@
             nodePackages.pnpm
             electron
             python3
-            go
-            hugo
           ];
 
           # VSCode extension installation
