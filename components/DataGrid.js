@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
+import { Check, X } from 'lucide-react'; // Import icons
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -73,6 +74,19 @@ export default function DataGrid({ data = [], schema = null }) {
                     {tag}
                   </Badge>
                 ))}
+              </div>
+            );
+          }
+
+          // Handle boolean values with icons
+          if (typeof value === 'boolean') {
+            return (
+              <div className="flex justify-center items-center">
+                {value ? (
+                  <Check className="text-green-500 w-5 h-5" aria-label="True" />
+                ) : (
+                  <X className="text-red-500 w-5 h-5" aria-label="False" />
+                )}
               </div>
             );
           }
