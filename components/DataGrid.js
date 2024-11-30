@@ -99,18 +99,18 @@ export default function DataGrid({ data = [], schema = null }) {
         id: key, // Ensure every column has an id
         header: ({ column }) => (
           <div
-            className={`flex items-center ${
+            className={`flex items-center justify-center w-full ${
               centerAlignedColumns.includes(key) ||
               typeof data[0]?.[key] === 'boolean'
                 ? 'justify-center'
-                : ''
+                : 'justify-start'
             }`}
           >
             {sortableColumns.includes(key) ? (
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center space-x-2 data-[state=open]:bg-accent"
+                className="flex items-center space-x-2 data-[state=open]:bg-accent w-full"
                 onClick={() => {
                   const currentSort = column.getIsSorted();
                   column.toggleSorting(
@@ -122,7 +122,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   );
                 }}
               >
-                <span>{formatHeader(key)}</span>
+                <span className="w-full text-center">{formatHeader(key)}</span>
                 {column.getIsSorted() === 'asc' ? (
                   <ArrowUp className="w-4 h-4" />
                 ) : column.getIsSorted() === 'desc' ? (
@@ -132,7 +132,7 @@ export default function DataGrid({ data = [], schema = null }) {
                 )}
               </Button>
             ) : (
-              <span>{formatHeader(key)}</span>
+              <span className="w-full text-center">{formatHeader(key)}</span>
             )}
           </div>
         ),
