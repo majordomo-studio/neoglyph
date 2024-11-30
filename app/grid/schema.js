@@ -1,10 +1,10 @@
 const schema = {
   // Toggle toolbar (true or false)
   showToolbar: true,
-  // Toggle footer (true or false)
-  showFooter: true,
   // Toggle actions column (true or false)
   showActions: true,
+  // Toggle footer (true or false)
+  showFooter: true,
   // Toggle selected row count (true or false)
   selectedRowCount: false,
   // Specify columns (keys) to display and their order
