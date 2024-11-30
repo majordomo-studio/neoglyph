@@ -71,16 +71,8 @@ export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
+  const [sorting, setSorting] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState(''); // New state for global filter
-
-  // Initialize sorting based on schema's defaultSorting
-  const [sorting, setSorting] = React.useState(() => {
-    const defaultSorting = schema?.defaultSorting || [];
-    return defaultSorting.map(({ key, desc }) => ({
-      id: key, // Map `key` to `id` for React Table
-      desc: desc || false,
-    }));
-  });
 
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
@@ -96,46 +88,47 @@ export default function DataGrid({ data = [], schema = null }) {
     return [
       ...schemaColumns.map((key) => ({
         accessorKey: key,
-        id: key, // Ensure every column has an id
-        header: ({ column }) => (
-          <div
-            className={`flex items-center justify-center w-full ${
-              centerAlignedColumns.includes(key) ||
-              typeof data[0]?.[key] === 'boolean'
-                ? 'justify-center'
-                : 'justify-start'
-            }`}
-          >
-            {sortableColumns.includes(key) ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2 data-[state=open]:bg-accent w-full"
-                onClick={() => {
-                  const currentSort = column.getIsSorted();
-                  column.toggleSorting(
-                    currentSort === 'asc'
-                      ? true
-                      : currentSort === 'desc'
-                        ? false
-                        : undefined
-                  );
-                }}
-              >
-                <span className="w-full text-center">{formatHeader(key)}</span>
-                {column.getIsSorted() === 'asc' ? (
-                  <ArrowUp className="w-4 h-4" />
-                ) : column.getIsSorted() === 'desc' ? (
-                  <ArrowDown className="w-4 h-4" />
-                ) : (
-                  <ChevronsUpDown className="w-4 h-4" />
-                )}
-              </Button>
-            ) : (
-              <span className="w-full text-center">{formatHeader(key)}</span>
-            )}
-          </div>
-        ),
+        id: key,
+        header: ({ column }) => {
+          const columnId = column.id; // Ensure we are using the correct identifier
+          const isCenterAligned =
+            centerAlignedColumns.includes(columnId) ||
+            typeof data[0]?.[columnId] === 'boolean'; // Center align if in schema or if the column is boolean
+
+          return (
+            <div className={`${isCenterAligned ? 'text-center' : ''}`}>
+              {sortableColumns.includes(columnId) ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-2 data-[state=open]:bg-accent"
+                  onClick={() => {
+                    const currentSort = column.getIsSorted();
+                    column.toggleSorting(
+                      currentSort === 'asc'
+                        ? true
+                        : currentSort === 'desc'
+                          ? false
+                          : undefined
+                    );
+                  }}
+                >
+                  <span>{formatHeader(columnId)}</span>
+                  {column.getIsSorted() === 'asc' ? (
+                    <ArrowUp className="w-4 h-4" />
+                  ) : column.getIsSorted() === 'desc' ? (
+                    <ArrowDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronsUpDown className="w-4 h-4" />
+                  )}
+                </Button>
+              ) : (
+                <span>{formatHeader(columnId)}</span>
+              )}
+            </div>
+          );
+        },
+
         cell: ({ row }) => {
           const value = row.getValue(key);
 
@@ -234,7 +227,6 @@ export default function DataGrid({ data = [], schema = null }) {
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getRowId: (row, index) => row?.id || row?.key || `row-${index}`, // Ensure unique row IDs
   });
 
   const renderToolbar = () => {
@@ -366,8 +358,8 @@ export default function DataGrid({ data = [], schema = null }) {
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {/* {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected. */}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
