@@ -58,9 +58,13 @@ import {
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
+  if (key.length === 2) {
+    // Capitalize both letters for two-letter keys
+    return key.toUpperCase();
+  }
   return key
     .replace(/_/g, ' ') // Replace underscores with spaces
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
 };
 
 export default function DataGrid({ data = [], schema = null }) {
@@ -298,7 +302,7 @@ export default function DataGrid({ data = [], schema = null }) {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {formatHeader(column.id)}
                   </DropdownMenuCheckboxItem>
                 ))}
             </DropdownMenuContent>
