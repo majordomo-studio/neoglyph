@@ -40,6 +40,16 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 
 import {
@@ -72,6 +82,8 @@ export default function DataGrid({ data = [], schema = null }) {
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState(''); // New state for global filter
+  const [alertDialogOpen, setAlertDialogOpen] = React.useState(false); // For delete confirmation
+  const [rowToDelete, setRowToDelete] = React.useState(null); // Row selected for deletion
 
   // Initialize sorting based on schema's defaultSorting
   const [sorting, setSorting] = React.useState(() => {
@@ -206,9 +218,10 @@ export default function DataGrid({ data = [], schema = null }) {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() =>
-                      console.log('Delete clicked for:', row.original)
-                    }
+                    onClick={() => {
+                      setRowToDelete(row.original);
+                      setAlertDialogOpen(true); // Open the alert dialog
+                    }}
                   >
                     Delete
                   </DropdownMenuItem>
@@ -323,6 +336,16 @@ export default function DataGrid({ data = [], schema = null }) {
         </div>
       </div>
     );
+  };
+
+  const handleDelete = async () => {
+    setAlertDialogOpen(false);
+    console.log('Deleting row:', rowToDelete);
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+    const updatedData = data.filter((item) => item.id !== rowToDelete.id);
+    // Update the DataGrid data
+    console.log('Updated data:', updatedData);
+    setRowToDelete(null); // Clear the row to delete
   };
 
   return (
@@ -449,6 +472,21 @@ export default function DataGrid({ data = [], schema = null }) {
           </div>
         </div>
       )}
+      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this item? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
