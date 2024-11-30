@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
+
 import {
   Check,
   X,
@@ -47,6 +48,9 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ChevronsUpDown,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react'; // Import icons
 
 // Helper function to format column headers for display purposes
@@ -67,6 +71,11 @@ export default function DataGrid({ data = [], schema = null }) {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
     const badgeColumns = schema?.badgeColumns || []; // Add badgeColumns to schema
     const centerAlignedColumns = schema?.centerAlignedColumns || []; // Add centerAlignedColumns to schema
+    const sortableColumns = schema?.sortableColumns || [
+      'title',
+      'description',
+      'category',
+    ]; // Add sortableColumns to schema
 
     return [
       ...schemaColumns.map((key) => ({
@@ -74,14 +83,41 @@ export default function DataGrid({ data = [], schema = null }) {
         id: key,
         header: ({ column }) => (
           <div
-            className={`${
+            className={`flex items-center ${
               centerAlignedColumns.includes(key) ||
               typeof data[0]?.[key] === 'boolean'
-                ? 'text-center'
+                ? 'justify-center'
                 : ''
             }`}
           >
-            {formatHeader(key)}
+            {sortableColumns.includes(key) ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2 data-[state=open]:bg-accent"
+                onClick={() => {
+                  const currentSort = column.getIsSorted();
+                  column.toggleSorting(
+                    currentSort === 'asc'
+                      ? true
+                      : currentSort === 'desc'
+                        ? false
+                        : undefined
+                  );
+                }}
+              >
+                <span>{formatHeader(key)}</span>
+                {column.getIsSorted() === 'asc' ? (
+                  <ArrowUp className="w-4 h-4" />
+                ) : column.getIsSorted() === 'desc' ? (
+                  <ArrowDown className="w-4 h-4" />
+                ) : (
+                  <ChevronsUpDown className="w-4 h-4" />
+                )}
+              </Button>
+            ) : (
+              <span>{formatHeader(key)}</span>
+            )}
           </div>
         ),
         cell: ({ row }) => {
