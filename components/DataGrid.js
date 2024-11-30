@@ -65,6 +65,7 @@ import {
 } from 'lucide-react'; // Import icons
 
 import { Switch } from '@/components/ui/switch'; // Import ShadCN Switch
+import { Calendar } from '@/components/ui/calendar'; // Import ShadCN Calendar for date editing
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -84,6 +85,16 @@ export default function DataGrid({ data = [], schema = null }) {
   const [globalFilter, setGlobalFilter] = React.useState(''); // New state for global filter
   const [alertDialogOpen, setAlertDialogOpen] = React.useState(false); // For delete confirmation
   const [rowToDelete, setRowToDelete] = React.useState(null); // Row selected for deletion
+  const [isEditing, setIsEditing] = React.useState(false); // Tracks edit mode
+  const [editingRow, setEditingRow] = React.useState(null); // Tracks the row being edited
+  const [editingData, setEditingData] = React.useState(data); // Syncs editingData with the incoming data
+
+  // Sync editingData with the latest data when it changes
+  React.useEffect(() => {
+    if (!isEditing) {
+      setEditingData(data);
+    }
+  }, [data, isEditing]);
 
   // Initialize sorting based on schema's defaultSorting
   const [sorting, setSorting] = React.useState(() => {
@@ -93,6 +104,35 @@ export default function DataGrid({ data = [], schema = null }) {
       desc: desc || false,
     }));
   });
+
+  // Enter edit mode for a specific row
+  const handleEditClick = (row) => {
+    setIsEditing(true);
+    setEditingRow(row.original.id); // Use a unique identifier
+  };
+
+  // Cancel edit mode
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setEditingRow(null);
+    setEditingData(data); // Reset to original data
+  };
+
+  // Save changes made in edit mode
+  const handleSaveClick = () => {
+    console.log('Saving updated data:', editingData);
+    setIsEditing(false);
+    setEditingRow(null);
+  };
+
+  // Update cell value while editing
+  const updateCellValue = (rowId, columnId, value) => {
+    setEditingData((prevData) =>
+      prevData.map((row) =>
+        row.id === rowId ? { ...row, [columnId]: value } : row
+      )
+    );
+  };
 
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
@@ -104,6 +144,8 @@ export default function DataGrid({ data = [], schema = null }) {
       'description',
       'category',
     ]; // Add sortableColumns to schema
+    const editableColumns =
+      schema?.editableColumns || schemaColumns.filter((col) => col !== 'id'); // Defaults to all except `id`
 
     return [
       ...schemaColumns.map((key) => ({
@@ -151,6 +193,47 @@ export default function DataGrid({ data = [], schema = null }) {
         cell: ({ row }) => {
           const value = row.getValue(key);
 
+          if (isEditing && row.original.id === editingRow) {
+            if (editableColumns.includes(key)) {
+              if (typeof value === 'boolean') {
+                return (
+                  <Switch
+                    checked={
+                      editingData.find((r) => r.id === row.original.id)[key]
+                    }
+                    onCheckedChange={(checked) =>
+                      updateCellValue(row.original.id, key, checked)
+                    }
+                  />
+                );
+              }
+              if (typeof value === 'string') {
+                return (
+                  <Input
+                    value={
+                      editingData.find((r) => r.id === row.original.id)[key]
+                    }
+                    onChange={(e) =>
+                      updateCellValue(row.original.id, key, e.target.value)
+                    }
+                  />
+                );
+              }
+              if (key.toLowerCase().includes('date')) {
+                return (
+                  <Calendar
+                    selected={
+                      editingData.find((r) => r.id === row.original.id)[key]
+                    }
+                    onChange={(date) =>
+                      updateCellValue(row.original.id, key, date)
+                    }
+                  />
+                );
+              }
+            }
+          }
+
           if (key === 'tags' && Array.isArray(value)) {
             return (
               <div className="flex flex-wrap gap-2">
@@ -166,12 +249,7 @@ export default function DataGrid({ data = [], schema = null }) {
           if (typeof value === 'boolean') {
             return (
               <div className="flex justify-center items-center">
-                <Switch
-                  checked={value}
-                  onChange={() => {
-                    console.log(`Boolean switch toggled for row: ${row.id}`);
-                  }}
-                />
+                <Switch checked={value} disabled />
               </div>
             );
           }
@@ -210,11 +288,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
-                  <DropdownMenuItem
-                    onClick={() =>
-                      console.log('Edit clicked for:', row.original)
-                    }
-                  >
+                  <DropdownMenuItem onClick={() => handleEditClick(row)}>
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -233,10 +307,10 @@ export default function DataGrid({ data = [], schema = null }) {
         ),
       },
     ];
-  }, [schema, data]);
+  }, [schema, data, isEditing, editingRow, editingData]);
 
   const table = useReactTable({
-    data,
+    data: isEditing ? editingData : data,
     columns,
     state: {
       sorting,
@@ -264,77 +338,100 @@ export default function DataGrid({ data = [], schema = null }) {
     return (
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Input
-            placeholder="Search..."
-            value={globalFilter || ''}
-            onChange={(event) => setGlobalFilter(event.target.value)} // Update to use globalFilter
-            className="h-8 w-[250px]"
-          />
-          {schema?.filters?.map((key) => {
-            const column = table
-              .getAllColumns()
-              .find((col) => col.id === key || col.accessorKey === key);
-            if (!column) {
-              console.warn(
-                `The key "${key}" specified in schema.filters does not match any column.`
-              );
-              return null;
-            }
-            return (
-              <DataTableFacetedFilter
-                key={key}
-                column={column}
-                title={formatHeader(key)}
-                options={Array.from(column.getFacetedUniqueValues() || []).map(
-                  ([value]) => ({
-                    label: String(value),
-                    value: String(value),
-                  })
-                )}
-              />
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            Reset Filters
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex h-8">
-                <Settings2 />
-                View
+          {isEditing ? (
+            <>
+              <Button
+                variant="success"
+                className="h-8 px-2"
+                onClick={handleSaveClick}
+              >
+                Save
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[150px]">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== 'undefined' &&
-                    column.getCanHide()
-                )
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {formatHeader(column.id)}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <Button
+                variant="destructive"
+                className="h-8 px-2"
+                onClick={handleCancelClick}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Input
+                placeholder="Search..."
+                value={globalFilter || ''}
+                onChange={(event) => setGlobalFilter(event.target.value)} // Update to use globalFilter
+                className="h-8 w-[250px]"
+              />
+              {schema?.filters?.map((key) => {
+                const column = table
+                  .getAllColumns()
+                  .find((col) => col.id === key || col.accessorKey === key);
+                if (!column) {
+                  console.warn(
+                    `The key "${key}" specified in schema.filters does not match any column.`
+                  );
+                  return null;
+                }
+                return (
+                  <DataTableFacetedFilter
+                    key={key}
+                    column={column}
+                    title={formatHeader(key)}
+                    options={Array.from(
+                      column.getFacetedUniqueValues() || []
+                    ).map(([value]) => ({
+                      label: String(value),
+                      value: String(value),
+                    }))}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
+        {!isEditing && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => table.resetColumnFilters()}
+              className="h-8 px-2 lg:px-3"
+            >
+              Reset Filters
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex h-8">
+                  <Settings2 />
+                  View
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[150px]">
+                <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) =>
+                      typeof column.accessorFn !== 'undefined' &&
+                      column.getCanHide()
+                  )
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {formatHeader(column.id)}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
     );
   };
