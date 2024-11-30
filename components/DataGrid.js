@@ -53,8 +53,6 @@ import {
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 
 import {
-  Check,
-  X,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
@@ -65,6 +63,8 @@ import {
   ArrowDown,
   Settings2,
 } from 'lucide-react'; // Import icons
+
+import { Switch } from '@/components/ui/switch'; // Import ShadCN Switch
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -166,11 +166,12 @@ export default function DataGrid({ data = [], schema = null }) {
           if (typeof value === 'boolean') {
             return (
               <div className="flex justify-center items-center">
-                {value ? (
-                  <Check className="text-green-500 w-5 h-5" aria-label="True" />
-                ) : (
-                  <X className="text-red-500 w-5 h-5" aria-label="False" />
-                )}
+                <Switch
+                  checked={value}
+                  onChange={() => {
+                    console.log(`Boolean switch toggled for row: ${row.id}`);
+                  }}
+                />
               </div>
             );
           }
