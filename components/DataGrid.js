@@ -72,6 +72,7 @@ export default function DataGrid({ data = [], schema = null }) {
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [sorting, setSorting] = React.useState([]);
+  const [globalFilter, setGlobalFilter] = React.useState(''); // New state for global filter
 
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
@@ -212,11 +213,13 @@ export default function DataGrid({ data = [], schema = null }) {
       columnVisibility,
       rowSelection,
       columnFilters,
+      globalFilter, // Add globalFilter state
     },
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onGlobalFilterChange: setGlobalFilter, // Update global filter
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -231,16 +234,8 @@ export default function DataGrid({ data = [], schema = null }) {
         <div className="flex items-center gap-2">
           <Input
             placeholder="Search..."
-            value={(() => {
-              const firstColumnId = table.getAllColumns()?.[0]?.id || '';
-              return table.getColumn(firstColumnId)?.getFilterValue() || '';
-            })()}
-            onChange={(event) => {
-              const firstColumnId = table.getAllColumns()?.[0]?.id || '';
-              table
-                .getColumn(firstColumnId)
-                ?.setFilterValue(event.target.value);
-            }}
+            value={globalFilter || ''}
+            onChange={(event) => setGlobalFilter(event.target.value)} // Update to use globalFilter
             className="h-8 w-[250px]"
           />
           {schema?.filters?.map((key) => {
