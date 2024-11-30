@@ -1,5 +1,10 @@
 const schema = {
+  showToolbar: true, // Toggle toolbar
+  showFooter: true, // Toggle footer
+  selectedRowCount: false, // Toggle selected row count
   // order: ['size', 'color', 'price', 'rating', 'stock'],
+  // defaultSorting: [{ key: 'category', desc: false }],
+  sortableColumns: ['title', 'category', 'price'],
   filters: ['category', 'size'],
   badgeColumns: ['price', 'shipping_cost'],
   centerAlignedColumns: [
@@ -12,8 +17,6 @@ const schema = {
     'updated_at',
     'popularity',
   ],
-  sortableColumns: ['title', 'category', 'price'],
-  // defaultSorting: [{ key: 'category', desc: false }],
 };
 
 export default schema;
