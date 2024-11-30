@@ -71,8 +71,16 @@ export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
-  const [sorting, setSorting] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState(''); // New state for global filter
+
+  // Initialize sorting based on schema's defaultSorting
+  const [sorting, setSorting] = React.useState(() => {
+    const defaultSorting = schema?.defaultSorting || [];
+    return defaultSorting.map(({ key, desc }) => ({
+      id: key, // Map `key` to `id` for React Table
+      desc: desc || false,
+    }));
+  });
 
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
@@ -88,7 +96,7 @@ export default function DataGrid({ data = [], schema = null }) {
     return [
       ...schemaColumns.map((key) => ({
         accessorKey: key,
-        id: key,
+        id: key, // Ensure every column has an id
         header: ({ column }) => (
           <div
             className={`flex items-center ${
@@ -226,6 +234,7 @@ export default function DataGrid({ data = [], schema = null }) {
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getRowId: (row, index) => row?.id || row?.key || `row-${index}`, // Ensure unique row IDs
   });
 
   const renderToolbar = () => {

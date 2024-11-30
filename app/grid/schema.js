@@ -13,6 +13,7 @@ const schema = {
     'popularity',
   ],
   sortableColumns: ['title', 'category', 'price'],
+  // defaultSorting: [{ key: 'category', desc: false }],
 };
 
 export default schema;
