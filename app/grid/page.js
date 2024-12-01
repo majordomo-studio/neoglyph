@@ -22,15 +22,11 @@ export default function DataGridPage() {
   }, []);
 
   return (
-    <div className="m-8 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full">
-        <div className="w-full">
-          <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
-            DataGrid Demo
-          </h1>
-          <DataGrid data={items} schema={schema} />
-        </div>
-      </main>
-    </div>
+    <main className="m-8 font-[family-name:var(--font-geist-sans)]">
+      <h1 className="text-2xl font-bold mb-4 text-center sm:text-left">
+        DataGrid Demo
+      </h1>
+      <DataGrid data={items} schema={schema} />
+    </main>
   );
 }
