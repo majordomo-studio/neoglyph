@@ -39,8 +39,8 @@ import {
 import { cn } from '@/lib/utils';
 import { DataBricksFacetedFilter } from './DataBricksFacetedFilter';
 
-// Helper function to format headers for display purposes
-const formatHeader = (key) => {
+// Helper function to format keys for display purposes
+const formatKey = (key) => {
   if (key.length === 2) {
     // Capitalize both letters for two-letter keys
     return key.toUpperCase();
@@ -126,12 +126,6 @@ const DataBricks = ({
 
     setFilteredItems(sortedItems);
   }, [categoryFilter, sortHistory, columnFilters, items]);
-
-  const formatKey = (key) => {
-    return key
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
 
   const reorderKeys = (item, schema) => {
     if (!schema || !schema.order) return Object.entries(item);
@@ -394,7 +388,7 @@ const DataBricks = ({
             <DataBricksFacetedFilter
               key={key}
               columnKey={key}
-              title={formatHeader(key)}
+              title={formatKey(key)}
               items={items}
               columnFilters={columnFilters}
               setColumnFilters={setColumnFilters}

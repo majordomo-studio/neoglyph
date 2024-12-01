@@ -71,8 +71,8 @@ import { format } from 'date-fns'; // Import date-fns for formatting dates
 import { cn } from '@/lib/utils'; // Utility class names
 import { z } from 'zod'; // Import zod for schema validation
 
-// Helper function to format headers for display purposes
-const formatHeader = (key) => {
+// Helper function to format keys for display purposes
+const formatKey = (key) => {
   if (key.length === 2) {
     // Capitalize both letters for two-letter keys
     return key.toUpperCase();
@@ -259,7 +259,7 @@ export default function DataGrid({ data = [], schema = null }) {
                     );
                   }}
                 >
-                  <span>{formatHeader(columnId)}</span>
+                  <span>{formatKey(columnId)}</span>
                   {column.getIsSorted() === 'asc' ? (
                     <ArrowUp className="w-4 h-4" />
                   ) : column.getIsSorted() === 'desc' ? (
@@ -269,7 +269,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   )}
                 </Button>
               ) : (
-                <span>{formatHeader(columnId)}</span>
+                <span>{formatKey(columnId)}</span>
               )}
             </div>
           );
@@ -524,7 +524,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   <DataTableFacetedFilter
                     key={key}
                     column={column}
-                    title={formatHeader(key)}
+                    title={formatKey(key)}
                     options={Array.from(
                       column.getFacetedUniqueValues() || []
                     ).map(([value]) => ({
@@ -572,7 +572,7 @@ export default function DataGrid({ data = [], schema = null }) {
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {formatHeader(column.id)}
+                      {formatKey(column.id)}
                     </DropdownMenuCheckboxItem>
                   ))}
               </DropdownMenuContent>
