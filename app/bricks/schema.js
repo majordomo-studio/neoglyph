@@ -4,7 +4,7 @@ const schema = {
   // Specify which keys are sortable
   sortable: ['title', 'category', 'price'],
   // Specify which keys can be filtered in the toolbar
-  filters: ['category'],
+  filters: ['category', 'size'],
 };
 
 export default schema;
