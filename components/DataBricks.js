@@ -24,7 +24,9 @@ import {
   Maximize2,
   Shuffle,
   Layout,
-  SortAsc,
+  ChevronsUpDown,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -410,14 +412,14 @@ const DataBricks = ({
             Toggle Layout
           </Button>
           <Button variant="outline" onClick={() => setSortHistory(['title'])}>
-            <SortAsc />
+            <ChevronsUpDown />
             Sort by Title
           </Button>
           <Button
             variant="outline"
             onClick={() => setSortHistory(['category'])}
           >
-            <SortAsc />
+            <ChevronsUpDown />
             Sort by Category
           </Button>
         </div>

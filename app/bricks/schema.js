@@ -1,5 +1,5 @@
 const schema = {
-  // Specify keys to display and their order
+  // Specify keys to display in default view and their order
   order: ['size', 'color', 'price', 'rating', 'stock'],
   // Specify which keys are sortable
   sortable: ['title', 'category', 'price'],
