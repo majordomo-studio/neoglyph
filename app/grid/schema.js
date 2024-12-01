@@ -34,6 +34,7 @@ const schema = {
     'updated_at',
     'popularity',
   ],
+  // Specify zod schema
   zodSchema: {
     email: z.string().email('Invalid email format'),
     popularity: z.number().int().min(18, 'Must be 18 or more'),
