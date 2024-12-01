@@ -73,6 +73,7 @@ import {
 } from '@/components/ui/popover'; // ShadCN Popover for date picker
 import { format } from 'date-fns'; // Import date-fns for formatting dates
 import { cn } from '@/lib/utils'; // Utility class names
+import { z } from 'zod'; // Import zod for schema validation
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -85,6 +86,35 @@ const formatHeader = (key) => {
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
 };
 
+// Helper function to dynamically generate Zod schema based on data and custom schema
+const generateZodSchema = (data, customSchemas = {}) => {
+  const firstRow = data[0] || {};
+  const dynamicSchema = Object.keys(firstRow).reduce((acc, key) => {
+    const value = firstRow[key];
+
+    if (customSchemas[key]) {
+      // Use the custom schema if provided
+      acc[key] = customSchemas[key];
+    } else if (typeof value === 'string') {
+      acc[key] = z.string();
+    } else if (typeof value === 'boolean') {
+      acc[key] = z.boolean();
+    } else if (typeof value === 'number' && Number.isInteger(value)) {
+      acc[key] = z.number().int();
+    } else if (typeof value === 'number') {
+      acc[key] = z.number();
+    } else if (Array.isArray(value)) {
+      acc[key] = z.array(z.string()); // Default array validation
+    } else {
+      acc[key] = z.any(); // Fallback for other types
+    }
+
+    return acc;
+  }, {});
+
+  return z.object(dynamicSchema);
+};
+
 export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -95,6 +125,7 @@ export default function DataGrid({ data = [], schema = null }) {
   const [isEditing, setIsEditing] = React.useState(false); // Tracks edit mode
   const [editingRow, setEditingRow] = React.useState(null); // Tracks the row being edited
   const [editingData, setEditingData] = React.useState(data); // Syncs editingData with the incoming data
+  const [validationErrors, setValidationErrors] = React.useState({}); // State to track validation errors
 
   // Sync editingData with the latest data when it changes
   React.useEffect(() => {
@@ -102,6 +133,41 @@ export default function DataGrid({ data = [], schema = null }) {
       setEditingData(data);
     }
   }, [data, isEditing]);
+
+  // Generate Zod schema dynamically
+  const zodSchema = React.useMemo(() => {
+    return generateZodSchema(data, schema?.zodSchema || {});
+  }, [data, schema]);
+
+  // Validate editingData on save
+  const handleSaveClick = () => {
+    const errors = {};
+    let validationPassed = true;
+
+    editingData.forEach((row) => {
+      try {
+        zodSchema.parse(row); // Validate each row individually
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          validationPassed = false;
+          err.errors.forEach((error) => {
+            const field = error.path[0];
+            errors[field] = error.message; // Collect errors for each field
+          });
+        }
+      }
+    });
+
+    if (validationPassed) {
+      console.log('Validation passed:', editingData);
+      setIsEditing(false);
+      setEditingRow(null);
+      setValidationErrors({});
+    } else {
+      console.log('Validation errors:', errors);
+      setValidationErrors(errors); // Update validation errors
+    }
+  };
 
   // Initialize sorting based on schema's defaultSorting
   const [sorting, setSorting] = React.useState(() => {
@@ -123,13 +189,7 @@ export default function DataGrid({ data = [], schema = null }) {
     setIsEditing(false);
     setEditingRow(null);
     setEditingData(data); // Reset to original data
-  };
-
-  // Save changes made in edit mode
-  const handleSaveClick = () => {
-    console.log('Saving updated data:', editingData);
-    setIsEditing(false);
-    setEditingRow(null);
+    setValidationErrors({}); // Clear validation errors
   };
 
   // Update cell value while editing
@@ -139,6 +199,26 @@ export default function DataGrid({ data = [], schema = null }) {
         row.id === rowId ? { ...row, [columnId]: value } : row
       )
     );
+
+    // Re-validate on cell update
+    try {
+      zodSchema.parse(editingData);
+      setValidationErrors((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+        delete updatedErrors[columnId]; // Remove error for the column if validation passes
+        return updatedErrors;
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const error = err.errors.find((e) => e.path[0] === columnId);
+        if (error) {
+          setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            [columnId]: error.message,
+          }));
+        }
+      }
+    }
   };
 
   // Define columns dynamically based on schema and data
@@ -278,20 +358,30 @@ export default function DataGrid({ data = [], schema = null }) {
                   </Popover>
                 );
               }
+
               return (
-                <Input
-                  type={typeof value === 'number' ? 'number' : 'text'}
-                  value={editingData.find((r) => r.id === row.original.id)[key]}
-                  onChange={(e) =>
-                    updateCellValue(
-                      row.original.id,
-                      key,
-                      typeof value === 'number'
-                        ? parseFloat(e.target.value) || 0
-                        : e.target.value
-                    )
-                  }
-                />
+                <div className="flex flex-col">
+                  <Input
+                    type={typeof value === 'number' ? 'number' : 'text'}
+                    value={
+                      editingData.find((r) => r.id === row.original.id)[key]
+                    }
+                    onChange={(e) =>
+                      updateCellValue(
+                        row.original.id,
+                        key,
+                        typeof value === 'number'
+                          ? parseFloat(e.target.value) || 0
+                          : e.target.value
+                      )
+                    }
+                  />
+                  {validationErrors[key] && (
+                    <span className="text-sm text-red-600">
+                      {validationErrors[key]}
+                    </span>
+                  )}
+                </div>
               );
             }
           }
@@ -368,7 +458,7 @@ export default function DataGrid({ data = [], schema = null }) {
         ),
       },
     ];
-  }, [schema, data, isEditing, editingRow, editingData]);
+  }, [schema, data, isEditing, editingRow, editingData, validationErrors]);
 
   const table = useReactTable({
     data: isEditing ? editingData : data,
@@ -393,6 +483,7 @@ export default function DataGrid({ data = [], schema = null }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getRowId: (row, index) => row?.id || row?.key || `row-${index}`, // Ensure unique row IDs
   });
+
   const renderToolbar = () => {
     if (schema?.showToolbar === false) return null; // Conditionally render toolbar
     return (
@@ -495,7 +586,6 @@ export default function DataGrid({ data = [], schema = null }) {
       </div>
     );
   };
-
   const handleDelete = async () => {
     setAlertDialogOpen(false);
     console.log('Deleting row:', rowToDelete);

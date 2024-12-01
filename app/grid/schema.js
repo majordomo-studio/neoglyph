@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 const schema = {
   // Toggle toolbar (true or false)
   showToolbar: true,
@@ -32,6 +34,11 @@ const schema = {
     'updated_at',
     'popularity',
   ],
+  zodSchema: {
+    email: z.string().email('Invalid email format'),
+    popularity: z.number().int().min(18, 'Must be 18 or more'),
+    username: z.string().regex(/^[a-z0-9_]+$/, 'Invalid username format'),
+  },
 };
 
 export default schema;
