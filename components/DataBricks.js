@@ -39,6 +39,17 @@ import {
 import { cn } from '@/lib/utils';
 import { DataBricksFacetedFilter } from './DataBricksFacetedFilter';
 
+// Helper function to format headers for display purposes
+const formatHeader = (key) => {
+  if (key.length === 2) {
+    // Capitalize both letters for two-letter keys
+    return key.toUpperCase();
+  }
+  return key
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
+};
+
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1 },
@@ -383,6 +394,7 @@ const DataBricks = ({
             <DataBricksFacetedFilter
               key={key}
               columnKey={key}
+              title={formatHeader(key)}
               items={items}
               columnFilters={columnFilters}
               setColumnFilters={setColumnFilters}

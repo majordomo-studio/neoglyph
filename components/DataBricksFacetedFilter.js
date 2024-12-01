@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 export function DataBricksFacetedFilter({
   columnKey,
   items,
+  title,
   columnFilters,
   setColumnFilters,
 }) {
@@ -66,7 +67,7 @@ export function DataBricksFacetedFilter({
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircle />
-          {columnKey}
+          {title}
           {selectedValues.size > 0 && (
             <>
               <Badge

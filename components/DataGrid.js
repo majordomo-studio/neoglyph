@@ -71,7 +71,7 @@ import { format } from 'date-fns'; // Import date-fns for formatting dates
 import { cn } from '@/lib/utils'; // Utility class names
 import { z } from 'zod'; // Import zod for schema validation
 
-// Helper function to format column headers for display purposes
+// Helper function to format headers for display purposes
 const formatHeader = (key) => {
   if (key.length === 2) {
     // Capitalize both letters for two-letter keys
