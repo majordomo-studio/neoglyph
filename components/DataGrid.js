@@ -207,14 +207,21 @@ export default function DataGrid({ data = [], schema = null }) {
                   />
                 );
               }
-              if (typeof value === 'string') {
+              if (typeof value === 'string' || typeof value === 'number') {
                 return (
                   <Input
+                    type={typeof value === 'number' ? 'number' : 'text'}
                     value={
                       editingData.find((r) => r.id === row.original.id)[key]
                     }
                     onChange={(e) =>
-                      updateCellValue(row.original.id, key, e.target.value)
+                      updateCellValue(
+                        row.original.id,
+                        key,
+                        typeof value === 'number'
+                          ? parseFloat(e.target.value) || 0
+                          : e.target.value
+                      )
                     }
                   />
                 );
@@ -233,7 +240,6 @@ export default function DataGrid({ data = [], schema = null }) {
               }
             }
           }
-
           if (key === 'tags' && Array.isArray(value)) {
             return (
               <div className="flex flex-wrap gap-2">

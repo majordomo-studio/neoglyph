@@ -18,7 +18,7 @@ const schema = {
   // Specify which columns (keys) will display values in a badge component
   badgeColumns: ['price', 'shipping_cost'],
   // Specify which columns (keys) are allowed to have their values edited
-  editableColumns: ['price', 'size', 'is_featured'],
+  // editableColumns: ['price', 'size', 'is_featured'],
   // Specify which columns (keys) have a select component when editing
   editableColumnsSelect: ['size'],
   // Specify which columns (keys) should be center aligned
