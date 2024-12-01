@@ -66,6 +66,13 @@ import {
 
 import { Switch } from '@/components/ui/switch'; // Import ShadCN Switch
 import { Calendar } from '@/components/ui/calendar'; // Import ShadCN Calendar for date editing
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'; // ShadCN Popover for date picker
+import { format } from 'date-fns'; // Import date-fns for formatting dates
+import { cn } from '@/lib/utils'; // Utility class names
 
 // Helper function to format column headers for display purposes
 const formatHeader = (key) => {
@@ -207,37 +214,57 @@ export default function DataGrid({ data = [], schema = null }) {
                   />
                 );
               }
-              if (typeof value === 'string' || typeof value === 'number') {
-                return (
-                  <Input
-                    type={typeof value === 'number' ? 'number' : 'text'}
-                    value={
-                      editingData.find((r) => r.id === row.original.id)[key]
-                    }
-                    onChange={(e) =>
-                      updateCellValue(
-                        row.original.id,
-                        key,
-                        typeof value === 'number'
-                          ? parseFloat(e.target.value) || 0
-                          : e.target.value
-                      )
-                    }
-                  />
-                );
-              }
               if (key.toLowerCase().includes('date')) {
+                const dateValue = new Date(
+                  editingData.find((r) => r.id === row.original.id)[key]
+                );
+
                 return (
-                  <Calendar
-                    selected={
-                      editingData.find((r) => r.id === row.original.id)[key]
-                    }
-                    onChange={(date) =>
-                      updateCellValue(row.original.id, key, date)
-                    }
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="text-left font-normal"
+                      >
+                        {isNaN(dateValue.getTime())
+                          ? 'Pick a date'
+                          : format(dateValue, 'MM/dd/yyyy')}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          isNaN(dateValue.getTime()) ? undefined : dateValue
+                        }
+                        onSelect={(date) =>
+                          updateCellValue(
+                            row.original.id,
+                            key,
+                            date.toISOString()
+                          )
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 );
               }
+              return (
+                <Input
+                  type={typeof value === 'number' ? 'number' : 'text'}
+                  value={editingData.find((r) => r.id === row.original.id)[key]}
+                  onChange={(e) =>
+                    updateCellValue(
+                      row.original.id,
+                      key,
+                      typeof value === 'number'
+                        ? parseFloat(e.target.value) || 0
+                        : e.target.value
+                    )
+                  }
+                />
+              );
             }
           }
           if (key === 'tags' && Array.isArray(value)) {
@@ -500,10 +527,10 @@ export default function DataGrid({ data = [], schema = null }) {
           </TableBody>
         </Table>
       </div>
-      {schema?.showFooter !== false && ( // Conditionally render footer
+      {schema?.showFooter !== false && (
         <div className="flex items-center justify-between px-2">
           <div className="flex-1 text-sm text-muted-foreground">
-            {schema?.selectedRowCount !== false && ( // Conditionally render selected row count
+            {schema?.selectedRowCount !== false && (
               <div>
                 {table.getFilteredSelectedRowModel().rows.length} of{' '}
                 {table.getFilteredRowModel().rows.length} row(s) selected.
