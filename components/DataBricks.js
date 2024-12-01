@@ -17,7 +17,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Trash, Eye, EyeOff, Maximize2 } from 'lucide-react';
+import {
+  Trash,
+  Eye,
+  EyeOff,
+  Maximize2,
+  Shuffle,
+  Layout,
+  SortAsc,
+} from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -382,19 +390,29 @@ const DataBricks = ({
           ))}
         </div>
         <div className="flex gap-2">
-          <Button onClick={shuffleItems}>Shuffle</Button>
-          <Button onClick={() => setSortHistory(['title'])}>
-            Sort by Title
-          </Button>
-          <Button onClick={() => setSortHistory(['category'])}>
-            Sort by Category
+          <Button variant="outline" onClick={shuffleItems}>
+            <Shuffle />
+            Shuffle
           </Button>
           <Button
+            variant="outline"
             onClick={() =>
               setLayoutMode(layoutMode === 'masonry' ? 'vertical' : 'masonry')
             }
           >
+            <Layout />
             Toggle Layout
+          </Button>
+          <Button variant="outline" onClick={() => setSortHistory(['title'])}>
+            <SortAsc />
+            Sort by Title
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setSortHistory(['category'])}
+          >
+            <SortAsc />
+            Sort by Category
           </Button>
         </div>
       </div>
