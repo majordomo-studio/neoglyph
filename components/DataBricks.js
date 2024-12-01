@@ -29,6 +29,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import { DataBricksFacetedFilter } from './DataBricksFacetedFilter';
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
@@ -87,15 +88,25 @@ const DataBricks = ({
   const [fullWidthCardId, setFullWidthCardId] = useState(null);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState(null);
+  const [columnFilters, setColumnFilters] = useState({});
 
   useEffect(() => {
     const filterTest = getFilterTest(categoryFilter);
     const sortedItems = items
       .filter((item) => filterTest(item))
+      .filter((item) => {
+        // Apply faceted filters
+        for (const [key, values] of Object.entries(columnFilters)) {
+          if (values.length > 0 && !values.includes(item[key])) {
+            return false;
+          }
+        }
+        return true;
+      })
       .sort(getItemSorter(sortHistory));
 
     setFilteredItems(sortedItems);
-  }, [categoryFilter, sortHistory, items]);
+  }, [categoryFilter, sortHistory, columnFilters, items]);
 
   const formatKey = (key) => {
     return key
@@ -351,25 +362,41 @@ const DataBricks = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Input
-          placeholder="Search"
-          value={categoryFilter === '*' ? '' : categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value || '*')}
-          className="w-full max-w-sm"
-        />
-        <Button onClick={shuffleItems}>Shuffle</Button>
-        <Button onClick={() => setSortHistory(['title'])}>Sort by Title</Button>
-        <Button onClick={() => setSortHistory(['category'])}>
-          Sort by Category
-        </Button>
-        <Button
-          onClick={() =>
-            setLayoutMode(layoutMode === 'masonry' ? 'vertical' : 'masonry')
-          }
-        >
-          Toggle Layout
-        </Button>
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search"
+            value={categoryFilter === '*' ? '' : categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value || '*')}
+            className="w-full max-w-sm"
+          />
+          {/* Render Faceted Filters */}
+          {schema?.filters?.map((key) => (
+            <DataBricksFacetedFilter
+              key={key}
+              columnKey={key}
+              items={items}
+              columnFilters={columnFilters}
+              setColumnFilters={setColumnFilters}
+            />
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={shuffleItems}>Shuffle</Button>
+          <Button onClick={() => setSortHistory(['title'])}>
+            Sort by Title
+          </Button>
+          <Button onClick={() => setSortHistory(['category'])}>
+            Sort by Category
+          </Button>
+          <Button
+            onClick={() =>
+              setLayoutMode(layoutMode === 'masonry' ? 'vertical' : 'masonry')
+            }
+          >
+            Toggle Layout
+          </Button>
+        </div>
       </div>
 
       <AnimatePresence>
