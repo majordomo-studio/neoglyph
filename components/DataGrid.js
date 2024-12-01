@@ -214,7 +214,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   />
                 );
               }
-              if (key.toLowerCase().includes('date')) {
+              if (key.toLowerCase().includes('date') || key.endsWith('_at')) {
                 const dateValue = new Date(
                   editingData.find((r) => r.id === row.original.id)[key]
                 );
