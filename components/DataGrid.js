@@ -220,16 +220,12 @@ export default function DataGrid({ data = [], schema = null }) {
   // Define columns dynamically based on schema and data
   const columns = React.useMemo(() => {
     const schemaColumns = schema?.order || Object.keys(data[0] || {});
-    const badgeColumns = schema?.badgeColumns || []; // Add badgeColumns to schema
-    const centerAlignedColumns = schema?.centerAlignedColumns || []; // Add centerAlignedColumns to schema
-    const sortableColumns = schema?.sortableColumns || [
-      'title',
-      'description',
-      'category',
-    ]; // Add sortableColumns to schema
-    const editableColumns =
-      schema?.editableColumns || schemaColumns.filter((col) => col !== 'id'); // Defaults to all except `id`
-    const editableColumnsSelect = schema?.editableColumnsSelect || []; // Columns using Select
+    const badges = schema?.badges || []; // Add badges to schema
+    const alignedCenter = schema?.alignedCenter || []; // Add alignedCenter to schema
+    const sortable = schema?.sortable || ['title', 'description', 'category']; // Add sortable to schema
+    const editable =
+      schema?.editable || schemaColumns.filter((col) => col !== 'id'); // Defaults to all except `id`
+    const editableSelect = schema?.editableSelect || []; // Columns using Select
 
     return [
       ...schemaColumns.map((key) => ({
@@ -238,12 +234,12 @@ export default function DataGrid({ data = [], schema = null }) {
         header: ({ column }) => {
           const columnId = column.id; // Ensure we are using the correct identifier
           const isCenterAligned =
-            centerAlignedColumns.includes(columnId) ||
+            alignedCenter.includes(columnId) ||
             typeof data[0]?.[columnId] === 'boolean'; // Center align if in schema or if the column is boolean
 
           return (
             <div className={`${isCenterAligned ? 'text-center' : ''}`}>
-              {sortableColumns.includes(columnId) ? (
+              {sortable.includes(columnId) ? (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -278,8 +274,8 @@ export default function DataGrid({ data = [], schema = null }) {
           const value = row.getValue(key);
 
           if (isEditing && row.original.id === editingRow) {
-            if (editableColumns.includes(key)) {
-              if (editableColumnsSelect.includes(key)) {
+            if (editable.includes(key)) {
+              if (editableSelect.includes(key)) {
                 const uniqueValues = Array.from(
                   new Set(data.map((row) => row[key]))
                 ).filter((v) => v !== null && v !== undefined);
@@ -401,14 +397,14 @@ export default function DataGrid({ data = [], schema = null }) {
             );
           }
 
-          if (badgeColumns.includes(key)) {
+          if (badges.includes(key)) {
             return <Badge>{value}</Badge>;
           }
 
           return (
             <div
               className={`${
-                centerAlignedColumns.includes(key) ||
+                alignedCenter.includes(key) ||
                 typeof data[0]?.[key] === 'boolean'
                   ? 'text-center'
                   : ''
