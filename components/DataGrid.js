@@ -153,6 +153,7 @@ export default function DataGrid({ data = [], schema = null }) {
     ]; // Add sortableColumns to schema
     const editableColumns =
       schema?.editableColumns || schemaColumns.filter((col) => col !== 'id'); // Defaults to all except `id`
+    const editableColumnsSelect = schema?.editableColumnsSelect || []; // Columns using Select
 
     return [
       ...schemaColumns.map((key) => ({
@@ -202,6 +203,33 @@ export default function DataGrid({ data = [], schema = null }) {
 
           if (isEditing && row.original.id === editingRow) {
             if (editableColumns.includes(key)) {
+              if (editableColumnsSelect.includes(key)) {
+                const uniqueValues = Array.from(
+                  new Set(data.map((row) => row[key]))
+                ).filter((v) => v !== null && v !== undefined);
+
+                return (
+                  <Select
+                    value={
+                      editingData.find((r) => r.id === row.original.id)[key]
+                    }
+                    onValueChange={(newValue) =>
+                      updateCellValue(row.original.id, key, newValue)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueValues.map((uniqueValue, index) => (
+                        <SelectItem key={index} value={uniqueValue}>
+                          {uniqueValue}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                );
+              }
               if (typeof value === 'boolean') {
                 return (
                   <Switch
@@ -365,7 +393,6 @@ export default function DataGrid({ data = [], schema = null }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getRowId: (row, index) => row?.id || row?.key || `row-${index}`, // Ensure unique row IDs
   });
-
   const renderToolbar = () => {
     if (schema?.showToolbar === false) return null; // Conditionally render toolbar
     return (

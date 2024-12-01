@@ -20,7 +20,7 @@ const schema = {
   // Specify which columns (keys) are allowed to have their values edited
   // editableColumns: ['price', 'size', 'is_featured'],
   // Specify which columns (keys) have a select component when editing
-  editableColumnsSelect: ['size'],
+  editableColumnsSelect: ['category', 'size', 'color'],
   // Specify which columns (keys) should be center aligned
   centerAlignedColumns: [
     'category',
