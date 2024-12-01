@@ -25,6 +25,8 @@ import {
   Shuffle,
   Layout,
   ChevronsUpDown,
+  Check,
+  X,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -36,14 +38,20 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import {
+  Table,
+  TableRow,
+  TableHeader,
+  TableCell,
+  TableBody,
+} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { DataBricksFacetedFilter } from './DataBricksFacetedFilter';
 
 // Helper function to format keys for display purposes
 const formatKey = (key) => {
   if (key.length === 2) {
-    // Capitalize both letters for two-letter keys
-    return key.toUpperCase();
+    return key.toUpperCase(); // Capitalize two-letter keys
   }
   return key
     .replace(/_/g, ' ') // Replace underscores with spaces
@@ -57,26 +65,19 @@ const itemVariants = {
 };
 
 const getFilterTest = (filter) => {
-  // If the filter is "*" or empty, show all items
   if (!filter || filter.trim() === '*' || filter.trim() === '') {
     return () => true;
   }
-
   const lowerCaseFilter = filter.toLowerCase();
-
-  return (item) => {
-    // Search across all fields, including key-value pairs
-    return Object.values(item).some((value) => {
+  return (item) =>
+    Object.values(item).some((value) => {
       if (Array.isArray(value)) {
-        // If the value is an array (e.g., tags), check if any of the elements match the filter
         return value.some((arrayItem) =>
           String(arrayItem).toLowerCase().includes(lowerCaseFilter)
         );
       }
-      // Convert non-array values to strings and check if they include the filter
       return String(value).toLowerCase().includes(lowerCaseFilter);
     });
-  };
 };
 
 const getItemSorter =
@@ -97,7 +98,7 @@ const DataBricks = ({
   filter = '*',
   sortBy = ['original-order'],
   transitionDuration = 300,
-  schema = null, // Accept schema as a prop
+  schema = null,
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [sortHistory, setSortHistory] = useState(sortBy);
@@ -115,7 +116,7 @@ const DataBricks = ({
     setLocalItems(
       items.map((item) => ({
         ...item,
-        isHidden: item.isHidden || false, // Initialize isHidden if undefined
+        isHidden: item.isHidden || false,
       }))
     );
   }, [items]);
@@ -126,7 +127,6 @@ const DataBricks = ({
       .filter((item) => !item.isHidden)
       .filter((item) => filterTest(item))
       .filter((item) => {
-        // Apply faceted filters
         for (const [key, values] of Object.entries(columnFilters)) {
           if (values.length > 0 && !values.includes(item[key])) {
             return false;
@@ -151,6 +151,7 @@ const DataBricks = ({
       )
     );
   };
+
   const reorderKeys = (item, schema) => {
     if (!schema || !schema.order) return Object.entries(item);
     const orderedKeys = schema.order;
@@ -161,7 +162,6 @@ const DataBricks = ({
 
     return [...knownKeys, ...unknownKeys].map((key) => [key, item[key]]);
   };
-
   const shuffleItems = () => {
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
@@ -203,6 +203,35 @@ const DataBricks = ({
     setCardToDelete(null); // Clear the card to delete
   };
 
+  const renderKeyValuePairsInTable = (keyValuePairs) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableCell>Key</TableCell>
+          <TableCell>Value</TableCell>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {keyValuePairs.map(([key, value]) => (
+          <TableRow key={key}>
+            <TableCell>{formatKey(key)}</TableCell>
+            <TableCell>
+              {typeof value === 'boolean' ? (
+                value ? (
+                  <Check size={16} />
+                ) : (
+                  <X size={16} />
+                )
+              ) : (
+                value
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = reorderKeys(item, schema).filter(
       ([key]) =>
@@ -225,12 +254,7 @@ const DataBricks = ({
     return (
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex flex-col space-y-2">
-          {firstColumn.map(([key, value]) => (
-            <div key={key} className={`${key}_field text-sm text-gray-600`}>
-              <span className="font-medium">{formatKey(key)}:</span>
-              <span> {value}</span>
-            </div>
-          ))}
+          {renderKeyValuePairsInTable(firstColumn)}
         </div>
         {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
           <div
@@ -239,12 +263,7 @@ const DataBricks = ({
               isFullWidth ? 'ml-[25vw] is-full-width' : 'ml-[160px] is-large'
             )}
           >
-            {secondColumn.map(([key, value]) => (
-              <div key={key} className={`${key}_field text-sm text-gray-600`}>
-                <span className="font-medium">{formatKey(key)}:</span>
-                <span> {value}</span>
-              </div>
-            ))}
+            {renderKeyValuePairsInTable(secondColumn)}
           </div>
         )}
       </div>
