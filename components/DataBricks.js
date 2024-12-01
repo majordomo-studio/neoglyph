@@ -38,13 +38,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import {
-  Table,
-  TableRow,
-  TableHeader,
-  TableCell,
-  TableBody,
-} from '@/components/ui/table';
+import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { DataBricksFacetedFilter } from './DataBricksFacetedFilter';
 
@@ -205,12 +199,6 @@ const DataBricks = ({
 
   const renderKeyValuePairsInTable = (keyValuePairs) => (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableCell>Key</TableCell>
-          <TableCell>Value</TableCell>
-        </TableRow>
-      </TableHeader>
       <TableBody>
         {keyValuePairs.map(([key, value]) => (
           <TableRow key={key}>
@@ -248,7 +236,7 @@ const DataBricks = ({
     const firstColumn = keyValuePairs.slice(0, 5);
     const secondColumn = keyValuePairs.slice(
       5,
-      isLargeSize ? 20 : isFullWidth ? keyValuePairs.length : 0
+      isLargeSize ? 18 : isFullWidth ? keyValuePairs.length : 0
     );
 
     return (
@@ -347,7 +335,7 @@ const DataBricks = ({
                       size={20}
                     />
                   </TooltipTrigger>
-                  <TooltipContent>Remove Item</TooltipContent>
+                  <TooltipContent>Delete</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
 
@@ -373,11 +361,11 @@ const DataBricks = ({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>{item.title}</CardTitle>
               <CardDescription>{item.description}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 pb-1">
+            <CardContent className="space-y-2">
               {renderKeyValuePairs(item, isFullWidth, isLargeSize)}
             </CardContent>
             {item.tags && Array.isArray(item.tags) && (
