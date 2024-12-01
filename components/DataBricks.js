@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -9,10 +9,15 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Trash, Eye, EyeOff, Maximize2 } from "lucide-react";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Trash, Eye, EyeOff, Maximize2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -22,8 +27,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
@@ -33,7 +38,7 @@ const itemVariants = {
 
 const getFilterTest = (filter) => {
   // If the filter is "*" or empty, show all items
-  if (!filter || filter.trim() === "*" || filter.trim() === "") {
+  if (!filter || filter.trim() === '*' || filter.trim() === '') {
     return () => true;
   }
 
@@ -54,28 +59,30 @@ const getFilterTest = (filter) => {
   };
 };
 
-const getItemSorter = (sortHistory, sortAsc = true) => (a, b) => {
-  for (const sortBy of sortHistory) {
-    const aValue = a[sortBy] || 0;
-    const bValue = b[sortBy] || 0;
-    if (aValue > bValue || aValue < bValue) {
-      return sortAsc ? (aValue > bValue ? 1 : -1) : (aValue > bValue ? -1 : 1);
+const getItemSorter =
+  (sortHistory, sortAsc = true) =>
+  (a, b) => {
+    for (const sortBy of sortHistory) {
+      const aValue = a[sortBy] || 0;
+      const bValue = b[sortBy] || 0;
+      if (aValue > bValue || aValue < bValue) {
+        return sortAsc ? (aValue > bValue ? 1 : -1) : aValue > bValue ? -1 : 1;
+      }
     }
-  }
-  return 0;
-};
+    return 0;
+  };
 
 const DataBricks = ({
   items = [],
-  filter = "*",
-  sortBy = ["original-order"],
+  filter = '*',
+  sortBy = ['original-order'],
   transitionDuration = 300,
   schema = null, // Accept schema as a prop
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [sortHistory, setSortHistory] = useState(sortBy);
   const [categoryFilter, setCategoryFilter] = useState(filter);
-  const [layoutMode, setLayoutMode] = useState("masonry");
+  const [layoutMode, setLayoutMode] = useState('masonry');
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [fullWidthCardId, setFullWidthCardId] = useState(null);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -92,7 +99,7 @@ const DataBricks = ({
 
   const formatKey = (key) => {
     return key
-      .replace(/_/g, " ")
+      .replace(/_/g, ' ')
       .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
@@ -112,9 +119,11 @@ const DataBricks = ({
   };
 
   const handleCardClick = (clickedItemId) => {
-    if (layoutMode === "vertical") {
+    if (layoutMode === 'vertical') {
       setFilteredItems((prevItems) => {
-        const clickedItemIndex = prevItems.findIndex((item) => item.id === clickedItemId);
+        const clickedItemIndex = prevItems.findIndex(
+          (item) => item.id === clickedItemId
+        );
         if (clickedItemIndex === -1) return prevItems;
 
         const updatedItems = [...prevItems];
@@ -127,7 +136,9 @@ const DataBricks = ({
       if (fullWidthCardId === clickedItemId) {
         setFullWidthCardId(null);
       } else {
-        setSelectedCardId((prevId) => (prevId === clickedItemId ? null : clickedItemId));
+        setSelectedCardId((prevId) =>
+          prevId === clickedItemId ? null : clickedItemId
+        );
       }
     }
   };
@@ -146,7 +157,15 @@ const DataBricks = ({
 
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = reorderKeys(item, schema).filter(
-      ([key]) => !["id", "title", "description", "category", "isHidden", "tags"].includes(key) // Exclude "tags"
+      ([key]) =>
+        ![
+          'id',
+          'title',
+          'description',
+          'category',
+          'isHidden',
+          'tags',
+        ].includes(key) // Exclude "tags"
     );
 
     const firstColumn = keyValuePairs.slice(0, 5);
@@ -168,8 +187,8 @@ const DataBricks = ({
         {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
           <div
             className={cn(
-              "flex flex-col space-y-2",
-              isFullWidth ? "ml-[25vw] is-full-width" : "ml-[160px] is-large"
+              'flex flex-col space-y-2',
+              isFullWidth ? 'ml-[25vw] is-full-width' : 'ml-[160px] is-large'
             )}
           >
             {secondColumn.map(([key, value]) => (
@@ -187,7 +206,8 @@ const DataBricks = ({
   const renderItems = () =>
     filteredItems.map((item, index) => {
       const isSelected = selectedCardId === item.id;
-      const isFullWidth = fullWidthCardId === item.id || layoutMode === "vertical";
+      const isFullWidth =
+        fullWidthCardId === item.id || layoutMode === 'vertical';
       const isLargeSize = isSelected && !isFullWidth;
 
       return (
@@ -199,16 +219,21 @@ const DataBricks = ({
           animate="visible"
           exit="exit"
           style={
-            layoutMode === "vertical"
-              ? { position: "absolute", top: `${index * 20}px`, zIndex: filteredItems.length - index }
+            layoutMode === 'vertical'
+              ? {
+                  position: 'absolute',
+                  top: `${index * 20}px`,
+                  zIndex: filteredItems.length - index,
+                }
               : {}
           }
           className={cn(
-            "aspect-square cursor-pointer", // Ensure all cards are square and have pointer cursor
-            layoutMode === "masonry" && "w-full",
-            layoutMode === "vertical" && "w-full col-span-full row-span-full aspect-square",
-            isSelected && "scale-[2] col-span-2 row-span-2", // Double size if clicked
-            isFullWidth && "col-span-full row-span-full w-full aspect-square" // Full width if maximized
+            'aspect-square cursor-pointer', // Ensure all cards are square and have pointer cursor
+            layoutMode === 'masonry' && 'w-full',
+            layoutMode === 'vertical' &&
+              'w-full col-span-full row-span-full aspect-square',
+            isSelected && 'scale-[2] col-span-2 row-span-2', // Double size if clicked
+            isFullWidth && 'col-span-full row-span-full w-full aspect-square' // Full width if maximized
           )}
           onClick={() => handleCardClick(item.id)}
         >
@@ -217,8 +242,49 @@ const DataBricks = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
+                    {item.isHidden ? (
+                      <Eye
+                        className="cursor-pointer hover:text-blue-700"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent click event bubbling
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id
+                                ? { ...i, isHidden: !i.isHidden }
+                                : i
+                            )
+                          );
+                        }}
+                        size={20}
+                      />
+                    ) : (
+                      <EyeOff
+                        className="cursor-pointer hover:text-blue-700"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent click event bubbling
+                          setFilteredItems((prev) =>
+                            prev.map((i) =>
+                              i.id === item.id
+                                ? { ...i, isHidden: !i.isHidden }
+                                : i
+                            )
+                          );
+                        }}
+                        size={20}
+                      />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {item.isHidden ? 'Show Item' : 'Hide Item'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
                     <Trash
-                      className="cursor-pointer text-red-500 hover:text-red-700"
+                      className="cursor-pointer hover:text-red-700"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent click event bubbling
                         confirmDeleteCard(item.id);
@@ -233,47 +299,10 @@ const DataBricks = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    {item.isHidden ? (
-                      <Eye
-                        className="cursor-pointer text-blue-500 hover:text-blue-700"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
-                            )
-                          );
-                        }}
-                        size={20}
-                      />
-                    ) : (
-                      <EyeOff
-                        className="cursor-pointer text-blue-500 hover:text-blue-700"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id ? { ...i, isHidden: !i.isHidden } : i
-                            )
-                          );
-                        }}
-                        size={20}
-                      />
-                    )}
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {item.isHidden ? "Show Item" : "Hide Item"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
                     <Maximize2
                       className={cn(
-                        "cursor-pointer text-green-500 hover:text-green-700",
-                        layoutMode === "vertical" && "hidden"
+                        'cursor-pointer hover:text-green-700',
+                        layoutMode === 'vertical' && 'hidden'
                       )}
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent click event bubbling
@@ -289,7 +318,7 @@ const DataBricks = ({
                 </Tooltip>
               </TooltipProvider>
             </div>
-
+            <div className="absolute top-5 right-5 flex gap-2"></div>
             <CardHeader>
               <CardTitle>{item.title}</CardTitle>
               <CardDescription>{item.description}</CardDescription>
@@ -300,12 +329,12 @@ const DataBricks = ({
             {item.tags && Array.isArray(item.tags) && (
               <CardFooter
                 className={cn(
-                  "absolute flex flex-wrap gap-2",
+                  'absolute flex flex-wrap gap-2',
                   isFullWidth
-                    ? "bottom-8 left-8"
+                    ? 'bottom-8 left-8'
                     : isLargeSize
-                    ? "bottom-0 left-0"
-                    : "bottom-[-5px] left-0"
+                      ? 'bottom-0 left-0'
+                      : 'bottom-[-5px] left-0'
                 )}
               >
                 {item.tags.map((tag, index) => (
@@ -325,16 +354,18 @@ const DataBricks = ({
       <div className="flex gap-2">
         <Input
           placeholder="Search"
-          value={categoryFilter === "*" ? "" : categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value || "*")}
+          value={categoryFilter === '*' ? '' : categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value || '*')}
           className="w-full max-w-sm"
         />
         <Button onClick={shuffleItems}>Shuffle</Button>
-        <Button onClick={() => setSortHistory(["title"])}>Sort by Title</Button>
-        <Button onClick={() => setSortHistory(["category"])}>Sort by Category</Button>
+        <Button onClick={() => setSortHistory(['title'])}>Sort by Title</Button>
+        <Button onClick={() => setSortHistory(['category'])}>
+          Sort by Category
+        </Button>
         <Button
           onClick={() =>
-            setLayoutMode(layoutMode === "masonry" ? "vertical" : "masonry")
+            setLayoutMode(layoutMode === 'masonry' ? 'vertical' : 'masonry')
           }
         >
           Toggle Layout
@@ -344,9 +375,9 @@ const DataBricks = ({
       <AnimatePresence>
         <div
           className={cn(
-            layoutMode === "masonry"
-              ? "grid gap-4 grid-cols-[repeat(auto-fit,_minmax(275px,_1fr))]"
-              : "relative h-screen"
+            layoutMode === 'masonry'
+              ? 'grid gap-4 grid-cols-[repeat(auto-fit,_minmax(275px,_1fr))]'
+              : 'relative h-screen'
           )}
         >
           {renderItems()}
@@ -358,12 +389,15 @@ const DataBricks = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this item? This action cannot be undone.
+              Are you sure you want to delete this item? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteCard}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteCard}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
