@@ -25,8 +25,6 @@ import {
   Shuffle,
   Layout,
   ChevronsUpDown,
-  ArrowUp,
-  ArrowDown,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -110,10 +108,22 @@ const DataBricks = ({
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState(null);
   const [columnFilters, setColumnFilters] = useState({});
+  const [hiddenItemsExist, setHiddenItemsExist] = useState(false);
+  const [localItems, setLocalItems] = useState([]);
+
+  useEffect(() => {
+    setLocalItems(
+      items.map((item) => ({
+        ...item,
+        isHidden: item.isHidden || false, // Initialize isHidden if undefined
+      }))
+    );
+  }, [items]);
 
   useEffect(() => {
     const filterTest = getFilterTest(categoryFilter);
-    const sortedItems = items
+    const sortedItems = localItems
+      .filter((item) => !item.isHidden)
       .filter((item) => filterTest(item))
       .filter((item) => {
         // Apply faceted filters
@@ -127,8 +137,20 @@ const DataBricks = ({
       .sort(getItemSorter(sortHistory));
 
     setFilteredItems(sortedItems);
-  }, [categoryFilter, sortHistory, columnFilters, items]);
+    setHiddenItemsExist(localItems.some((item) => item.isHidden));
+  }, [categoryFilter, sortHistory, columnFilters, localItems]);
 
+  const unhideAllItems = () => {
+    setLocalItems((prev) => prev.map((item) => ({ ...item, isHidden: false })));
+  };
+
+  const toggleItemVisibility = (id) => {
+    setLocalItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, isHidden: !item.isHidden } : item
+      )
+    );
+  };
   const reorderKeys = (item, schema) => {
     if (!schema || !schema.order) return Object.entries(item);
     const orderedKeys = schema.order;
@@ -177,7 +199,7 @@ const DataBricks = ({
   const handleDeleteCard = async () => {
     setAlertDialogOpen(false); // Close the dialog
     await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-    setFilteredItems((prev) => prev.filter((item) => item.id !== cardToDelete));
+    setLocalItems((prev) => prev.filter((item) => item.id !== cardToDelete));
     setCardToDelete(null); // Clear the card to delete
   };
 
@@ -191,7 +213,7 @@ const DataBricks = ({
           'category',
           'isHidden',
           'tags',
-        ].includes(key) // Exclude "tags"
+        ].includes(key)
     );
 
     const firstColumn = keyValuePairs.slice(0, 5);
@@ -254,12 +276,12 @@ const DataBricks = ({
               : {}
           }
           className={cn(
-            'aspect-square cursor-pointer', // Ensure all cards are square and have pointer cursor
+            'aspect-square cursor-pointer',
             layoutMode === 'masonry' && 'w-full',
             layoutMode === 'vertical' &&
               'w-full col-span-full row-span-full aspect-square',
-            isSelected && 'scale-[2] col-span-2 row-span-2', // Double size if clicked
-            isFullWidth && 'col-span-full row-span-full w-full aspect-square' // Full width if maximized
+            isSelected && 'scale-[2] col-span-2 row-span-2',
+            isFullWidth && 'col-span-full row-span-full w-full aspect-square'
           )}
           onClick={() => handleCardClick(item.id)}
         >
@@ -272,14 +294,8 @@ const DataBricks = ({
                       <Eye
                         className="cursor-pointer hover:text-blue-700"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, isHidden: !i.isHidden }
-                                : i
-                            )
-                          );
+                          e.stopPropagation();
+                          toggleItemVisibility(item.id);
                         }}
                         size={20}
                       />
@@ -287,14 +303,8 @@ const DataBricks = ({
                       <EyeOff
                         className="cursor-pointer hover:text-blue-700"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent click event bubbling
-                          setFilteredItems((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, isHidden: !i.isHidden }
-                                : i
-                            )
-                          );
+                          e.stopPropagation();
+                          toggleItemVisibility(item.id);
                         }}
                         size={20}
                       />
@@ -312,7 +322,7 @@ const DataBricks = ({
                     <Trash
                       className="cursor-pointer hover:text-red-700"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent click event bubbling
+                        e.stopPropagation();
                         confirmDeleteCard(item.id);
                       }}
                       size={20}
@@ -331,11 +341,11 @@ const DataBricks = ({
                         layoutMode === 'vertical' && 'hidden'
                       )}
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent click event bubbling
+                        e.stopPropagation();
                         setFullWidthCardId((prevId) =>
                           prevId === item.id ? null : item.id
                         );
-                        setSelectedCardId(null); // Clear double-size state
+                        setSelectedCardId(null);
                       }}
                       size={20}
                     />
@@ -344,7 +354,6 @@ const DataBricks = ({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="absolute top-5 right-5 flex gap-2"></div>
             <CardHeader>
               <CardTitle>{item.title}</CardTitle>
               <CardDescription>{item.description}</CardDescription>
@@ -374,7 +383,6 @@ const DataBricks = ({
         </motion.div>
       );
     });
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center gap-2">
@@ -398,6 +406,15 @@ const DataBricks = ({
           ))}
         </div>
         <div className="flex gap-2">
+          {hiddenItemsExist && (
+            <Button
+              variant="outline"
+              className="bg-green-500 text-white"
+              onClick={unhideAllItems}
+            >
+              Unhide All
+            </Button>
+          )}
           <Button variant="outline" onClick={shuffleItems}>
             <Shuffle />
             Shuffle
