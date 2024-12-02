@@ -58,8 +58,14 @@ const formatKey = (key) => {
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
 };
 
-// Helper function to truncate long text
-const truncateText = (text, maxLength = 55) => {
+// Helper function to truncate the description of cards when they are long
+const truncateDescription = (text, maxLength = 65) => {
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+};
+
+// Helper function to truncate values when they are long
+const truncateValue = (text, maxLength = 25) => {
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength)}...`;
 };
@@ -226,7 +232,7 @@ const DataBricks = ({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="text-left">{truncateText(value)}</div>
+                      <div className="text-left">{truncateValue(value)}</div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
                       {value}
@@ -391,7 +397,7 @@ const DataBricks = ({
                     <Tooltip>
                       <TooltipTrigger>
                         <div className="text-left">
-                          {truncateText(item.description)}
+                          {truncateDescription(item.description)}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
