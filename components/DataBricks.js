@@ -276,7 +276,7 @@ const DataBricks = ({
           <div
             className={cn(
               'flex flex-col space-y-2',
-              isFullWidth ? 'ml-[25vw] is-full-width' : 'ml-[160px] is-large'
+              isFullWidth ? 'ml-[25vw] is-full-width' : 'ml-[25px] is-large'
             )}
           >
             {renderKeyValuePairsInTable(secondColumn)}

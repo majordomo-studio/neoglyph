@@ -56,9 +56,9 @@
   {
     "id": 3,
     "title": "Item 3",
-    "description": "This is a tall card.",
+    "description": "Dynamic sort buttons based on schema, if key is in schema then a button will be added to toolbar.  clicking once sort ascending and changes icon to ARrowUp, clicking again will change to sort descending and change icon to ArrowDown, if clicking again then sort ascending again.",
     "category": "A",
-    "size": "sort buttons based on schema, if key is in schema then a button will be added to toolbar.  clicking once sort ascending and changes icon to ARrowUp, clicking again will change",
+    "size": "Dynamic sort buttons based on schema, if key is in schema then a button will be added to toolbar.  clicking once sort ascending and changes icon to ARrowUp, clicking again will change to sort descending and change icon to ArrowDown, if clicking again then sort ascending again.",
     "color": "green",
     "price": 9.99,
     "rating": 3.8,
@@ -83,7 +83,7 @@
   {
     "id": 4,
     "title": "Item 4",
-    "description": "Dynamic sort buttons based on schema, if key is in schema then a button will be added to toolbar.  clicking once sort ascending and changes icon to ARrowUp, clicking again will change to sort descending and change icon to ArrowDown, if clicking again then sort ascending again.",
+    "description": "A tall card.",
     "category": "C",
     "size": "square",
     "color": "yellow",
