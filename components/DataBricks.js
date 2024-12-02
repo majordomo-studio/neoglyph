@@ -259,7 +259,9 @@ const DataBricks = ({
           <TableRow key={key}>
             <TableCell>{formatKey(key)}</TableCell>
             <TableCell>
-              {typeof value === 'boolean' ? (
+              {schema?.badges?.includes(key) ? (
+                <Badge className="capitalize">{value}</Badge>
+              ) : typeof value === 'boolean' ? (
                 value ? (
                   <Check size={16} />
                 ) : (
