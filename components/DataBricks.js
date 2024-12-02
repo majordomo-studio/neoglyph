@@ -278,14 +278,19 @@ const DataBricks = ({
               : 'is-base'
         )}
       >
-        <div className="flex flex-col space-y-2">
+        <div
+          className={cn(
+            'flex flex-col space-y-2',
+            isFullWidth ? 'w-1/3' : isLargeSize ? 'w-1/2' : 'w-full'
+          )}
+        >
           {renderKeyValuePairsInTable(firstColumn)}
         </div>
         {secondColumn.length > 0 && (isLargeSize || isFullWidth) && (
           <div
             className={cn(
               'flex flex-col space-y-2',
-              isFullWidth ? 'ml-[25vw]' : 'ml-[25px]'
+              isFullWidth ? 'ml-[15vw]' : 'ml-[25px]'
             )}
           >
             {renderKeyValuePairsInTable(secondColumn)}
