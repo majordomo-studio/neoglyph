@@ -67,6 +67,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'; // ShadCN Popover for date picker
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'; // Import Tooltip
 import { format } from 'date-fns'; // Import date-fns for formatting dates
 import { cn } from '@/lib/utils'; // Utility class names
 import { z } from 'zod'; // Import zod for schema validation
@@ -83,7 +89,7 @@ const formatKey = (key) => {
 };
 
 // Helper function to truncate long text
-const truncateValue = (text, maxLength = 55) => {
+const truncateValue = (text, maxLength = 35) => {
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength)}...`;
 };
@@ -116,7 +122,6 @@ const generateZodSchema = (data, customSchemas = {}) => {
 
   return z.object(dynamicSchema);
 };
-
 export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -403,6 +408,21 @@ export default function DataGrid({ data = [], schema = null }) {
             );
           }
 
+          if (typeof value === 'string' && value.length > 35) {
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="text-left">{truncateValue(value, 35)}</div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[300px] p-2 text-sm shadow-md rounded-md">
+                    {value}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          }
+
           if (badges.includes(key)) {
             return <Badge>{value}</Badge>;
           }
@@ -584,6 +604,7 @@ export default function DataGrid({ data = [], schema = null }) {
       </div>
     );
   };
+
   const handleDelete = async () => {
     setAlertDialogOpen(false);
     console.log('Deleting row:', rowToDelete);
