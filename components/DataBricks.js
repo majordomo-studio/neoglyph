@@ -59,7 +59,7 @@ const formatKey = (key) => {
 };
 
 // Helper function to truncate long text
-const truncateText = (text, maxLength = 35) => {
+const truncateText = (text, maxLength = 55) => {
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength)}...`;
 };
@@ -226,8 +226,7 @@ const DataBricks = ({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <span>{truncateText(value)}</span>
-                      <MoreHorizontal size={16} />
+                      <div className="text-left">{truncateText(value)}</div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
                       {value}
@@ -391,8 +390,9 @@ const DataBricks = ({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        {truncateText(item.description)}
-                        <MoreHorizontal size={16} />
+                        <div className="text-left">
+                          {truncateText(item.description)}
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
                         {item.description}
