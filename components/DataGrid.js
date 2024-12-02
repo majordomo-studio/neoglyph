@@ -82,6 +82,12 @@ const formatKey = (key) => {
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
 };
 
+// Helper function to truncate long text
+const truncateValue = (text, maxLength = 55) => {
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+};
+
 // Helper function to dynamically generate Zod schema based on data and custom schema
 const generateZodSchema = (data, customSchemas = {}) => {
   const firstRow = data[0] || {};
