@@ -173,7 +173,6 @@ const DataBricks = ({
 
     return [...knownKeys, ...unknownKeys].map((key) => [key, item[key]]);
   };
-
   const shuffleItems = () => {
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
@@ -248,6 +247,7 @@ const DataBricks = ({
       </TableBody>
     </Table>
   );
+
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = reorderKeys(item, schema).filter(
       ([key]) =>
@@ -286,6 +286,41 @@ const DataBricks = ({
     );
   };
 
+  const renderTags = (tags) => {
+    const maxVisibleTags = 3;
+    const visibleTags = tags.slice(0, maxVisibleTags);
+    const hiddenTags = tags.slice(maxVisibleTags);
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {visibleTags.map((tag, index) => (
+          <Badge key={index} className="capitalize">
+            {tag}
+          </Badge>
+        ))}
+        {hiddenTags.length > 0 && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge variant="secondary" className="capitalize">
+                  +{hiddenTags.length}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="bg-white max-w-[300px] p-2 text-sm shadow-md rounded-md">
+                <div className="flex flex-wrap gap-2">
+                  {hiddenTags.map((tag, index) => (
+                    <Badge key={index} className="capitalize">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
+    );
+  };
   const renderItems = () =>
     filteredItems.map((item, index) => {
       const isSelected = selectedCardId === item.id;
@@ -400,7 +435,7 @@ const DataBricks = ({
                           {truncateDescription(item.description)}
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
+                      <TooltipContent className="max-w-[300px] p-2 text-sm shadow-md rounded-md">
                         {item.description}
                       </TooltipContent>
                     </Tooltip>
@@ -424,17 +459,14 @@ const DataBricks = ({
                       : 'bottom-[-5px] left-0'
                 )}
               >
-                {item.tags.map((tag, index) => (
-                  <Badge key={index} className="capitalize">
-                    {tag}
-                  </Badge>
-                ))}
+                {renderTags(item.tags)}
               </CardFooter>
             )}
           </Card>
         </motion.div>
       );
     });
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center gap-2">
@@ -493,7 +525,6 @@ const DataBricks = ({
           </Button>
         </div>
       </div>
-
       <AnimatePresence>
         <div
           className={cn(
@@ -505,7 +536,6 @@ const DataBricks = ({
           {renderItems()}
         </div>
       </AnimatePresence>
-
       <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
