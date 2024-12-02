@@ -94,6 +94,13 @@ const truncateValue = (text, maxLength = 35) => {
   return `${text.slice(0, maxLength)}...`;
 };
 
+// Helper function for tags
+const truncateTags = (tags, maxTags = 3) => {
+  const visibleTags = tags.slice(0, maxTags);
+  const remainingTags = tags.slice(maxTags);
+
+  return { visibleTags, remainingTags };
+};
 // Helper function to dynamically generate Zod schema based on data and custom schema
 const generateZodSchema = (data, customSchemas = {}) => {
   const firstRow = data[0] || {};
@@ -122,6 +129,7 @@ const generateZodSchema = (data, customSchemas = {}) => {
 
   return z.object(dynamicSchema);
 };
+
 export default function DataGrid({ data = [], schema = null }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -198,7 +206,6 @@ export default function DataGrid({ data = [], schema = null }) {
     setEditingData(data); // Reset to original data
     setValidationErrors({}); // Clear validation errors
   };
-
   // Update cell value while editing
   const updateCellValue = (rowId, columnId, value) => {
     setEditingData((prevData) =>
@@ -389,13 +396,37 @@ export default function DataGrid({ data = [], schema = null }) {
             }
           }
           if (key === 'tags' && Array.isArray(value)) {
+            const maxVisibleTags = 3; // Limit to three tags in the main cell
+            const visibleTags = value.slice(0, maxVisibleTags);
+            const hiddenTags = value.slice(maxVisibleTags);
+
             return (
               <div className="flex flex-wrap gap-2">
-                {value.map((tag, index) => (
+                {visibleTags.map((tag, index) => (
                   <Badge key={index} className="capitalize">
                     {tag}
                   </Badge>
                 ))}
+                {hiddenTags.length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge variant="secondary" className="capitalize">
+                          +{hiddenTags.length}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-white max-w-[300px] p-2 text-sm shadow-md rounded-md">
+                        <div className="flex flex-wrap gap-2">
+                          {hiddenTags.map((tag, index) => (
+                            <Badge key={index} className="capitalize">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </div>
             );
           }
@@ -733,7 +764,7 @@ export default function DataGrid({ data = [], schema = null }) {
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <ChevronsRight />
+                <ChevronsUpDown />
               </Button>
             </div>
           </div>
