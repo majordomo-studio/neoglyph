@@ -18,6 +18,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from '@/components/ui/hover-card';
+import {
   Trash,
   Eye,
   EyeOff,
@@ -27,6 +32,7 @@ import {
   ChevronsUpDown,
   Check,
   X,
+  MoreHorizontal,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -50,6 +56,12 @@ const formatKey = (key) => {
   return key
     .replace(/_/g, ' ') // Replace underscores with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Convert to title case
+};
+
+// Helper function to truncate long text
+const truncateText = (text, maxLength = 35) => {
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
 };
 
 const itemVariants = {
@@ -105,7 +117,6 @@ const DataBricks = ({
   const [columnFilters, setColumnFilters] = useState({});
   const [hiddenItemsExist, setHiddenItemsExist] = useState(false);
   const [localItems, setLocalItems] = useState([]);
-
   useEffect(() => {
     setLocalItems(
       items.map((item) => ({
@@ -156,6 +167,7 @@ const DataBricks = ({
 
     return [...knownKeys, ...unknownKeys].map((key) => [key, item[key]]);
   };
+
   const shuffleItems = () => {
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
@@ -191,10 +203,10 @@ const DataBricks = ({
   };
 
   const handleDeleteCard = async () => {
-    setAlertDialogOpen(false); // Close the dialog
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+    setAlertDialogOpen(false);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     setLocalItems((prev) => prev.filter((item) => item.id !== cardToDelete));
-    setCardToDelete(null); // Clear the card to delete
+    setCardToDelete(null);
   };
 
   const renderKeyValuePairsInTable = (keyValuePairs) => (
@@ -210,6 +222,18 @@ const DataBricks = ({
                 ) : (
                   <X size={16} />
                 )
+              ) : typeof value === 'string' && value.length > 35 ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span>{truncateText(value)}</span>
+                      <MoreHorizontal size={16} />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
+                      {value}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : (
                 value
               )}
@@ -219,7 +243,6 @@ const DataBricks = ({
       </TableBody>
     </Table>
   );
-
   const renderKeyValuePairs = (item, isFullWidth, isLargeSize) => {
     const keyValuePairs = reorderKeys(item, schema).filter(
       ([key]) =>
@@ -361,9 +384,25 @@ const DataBricks = ({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-0">
               <CardTitle>{item.title}</CardTitle>
-              <CardDescription>{item.description}</CardDescription>
+              <CardDescription>
+                {item.description.length > 35 ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {truncateText(item.description)}
+                        <MoreHorizontal size={16} />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
+                        {item.description}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <div className="pb-2 max-w-[300px]">{item.description}</div>
+                )}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {renderKeyValuePairs(item, isFullWidth, isLargeSize)}

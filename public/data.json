@@ -56,9 +56,9 @@
   {
     "id": 3,
     "title": "Item 3",
-    "description": "Dynamic sort buttons based on schema, if key is in schema then a button will be.",
+    "description": "This is a tall card.",
     "category": "A",
-    "size": "tall",
+    "size": "sort buttons based on schema, if key is in schema then a button will be added to toolbar.  clicking once sort ascending and changes icon to ARrowUp, clicking again will change",
     "color": "green",
     "price": 9.99,
     "rating": 3.8,
