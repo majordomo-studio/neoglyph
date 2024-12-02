@@ -268,7 +268,16 @@ const DataBricks = ({
     );
 
     return (
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div
+        className={cn(
+          'flex flex-col lg:flex-row gap-4',
+          isFullWidth
+            ? 'is-full-width mt-6'
+            : isLargeSize
+              ? 'is-large mt-6'
+              : 'is-base'
+        )}
+      >
         <div className="flex flex-col space-y-2">
           {renderKeyValuePairsInTable(firstColumn)}
         </div>
@@ -276,7 +285,7 @@ const DataBricks = ({
           <div
             className={cn(
               'flex flex-col space-y-2',
-              isFullWidth ? 'ml-[25vw] is-full-width' : 'ml-[25px] is-large'
+              isFullWidth ? 'ml-[25vw]' : 'ml-[25px]'
             )}
           >
             {renderKeyValuePairsInTable(secondColumn)}
