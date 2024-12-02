@@ -18,11 +18,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from '@/components/ui/hover-card';
-import {
   Trash,
   Eye,
   EyeOff,
@@ -30,9 +25,10 @@ import {
   Shuffle,
   Layout,
   ChevronsUpDown,
+  ArrowUp,
+  ArrowDown,
   Check,
   X,
-  MoreHorizontal,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -93,18 +89,15 @@ const getFilterTest = (filter) => {
 };
 
 const getItemSorter =
-  (sortHistory, sortAsc = true) =>
+  (sortKey, sortAsc = true) =>
   (a, b) => {
-    for (const sortBy of sortHistory) {
-      const aValue = a[sortBy] || 0;
-      const bValue = b[sortBy] || 0;
-      if (aValue > bValue || aValue < bValue) {
-        return sortAsc ? (aValue > bValue ? 1 : -1) : aValue > bValue ? -1 : 1;
-      }
+    const aValue = a[sortKey] || 0;
+    const bValue = b[sortKey] || 0;
+    if (aValue > bValue || aValue < bValue) {
+      return sortAsc ? (aValue > bValue ? 1 : -1) : aValue > bValue ? -1 : 1;
     }
     return 0;
   };
-
 const DataBricks = ({
   items = [],
   filter = '*',
@@ -113,7 +106,8 @@ const DataBricks = ({
   schema = null,
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
-  const [sortHistory, setSortHistory] = useState(sortBy);
+  const [sortKey, setSortKey] = useState(null);
+  const [sortAsc, setSortAsc] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState(filter);
   const [layoutMode, setLayoutMode] = useState('masonry');
   const [selectedCardId, setSelectedCardId] = useState(null);
@@ -123,6 +117,7 @@ const DataBricks = ({
   const [columnFilters, setColumnFilters] = useState({});
   const [hiddenItemsExist, setHiddenItemsExist] = useState(false);
   const [localItems, setLocalItems] = useState([]);
+
   useEffect(() => {
     setLocalItems(
       items.map((item) => ({
@@ -145,11 +140,20 @@ const DataBricks = ({
         }
         return true;
       })
-      .sort(getItemSorter(sortHistory));
+      .sort(getItemSorter(sortKey, sortAsc));
 
     setFilteredItems(sortedItems);
     setHiddenItemsExist(localItems.some((item) => item.isHidden));
-  }, [categoryFilter, sortHistory, columnFilters, localItems]);
+  }, [categoryFilter, sortKey, sortAsc, columnFilters, localItems]);
+
+  const toggleSortKey = (key) => {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(true);
+    }
+  };
 
   const unhideAllItems = () => {
     setLocalItems((prev) => prev.map((item) => ({ ...item, isHidden: false })));
@@ -163,6 +167,22 @@ const DataBricks = ({
     );
   };
 
+  const renderSortButtons = () => {
+    return schema?.sortable?.map((key) => (
+      <Button key={key} variant="outline" onClick={() => toggleSortKey(key)}>
+        {sortKey === key ? (
+          sortAsc ? (
+            <ArrowUp />
+          ) : (
+            <ArrowDown />
+          )
+        ) : (
+          <ChevronsUpDown />
+        )}
+        Sort by {formatKey(key)}
+      </Button>
+    ));
+  };
   const reorderKeys = (item, schema) => {
     if (!schema || !schema.order) return Object.entries(item);
     const orderedKeys = schema.order;
@@ -173,6 +193,7 @@ const DataBricks = ({
 
     return [...knownKeys, ...unknownKeys].map((key) => [key, item[key]]);
   };
+
   const shuffleItems = () => {
     setFilteredItems((prev) => [...prev].sort(() => Math.random() - 0.5));
   };
@@ -233,7 +254,7 @@ const DataBricks = ({
                     <TooltipTrigger>
                       <div className="text-left">{truncateValue(value)}</div>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-[300px] p-2 text-sm  shadow-md rounded-md">
+                    <TooltipContent className="max-w-[300px] p-2 text-sm shadow-md rounded-md">
                       {value}
                     </TooltipContent>
                   </Tooltip>
@@ -526,17 +547,7 @@ const DataBricks = ({
             <Layout />
             Toggle Layout
           </Button>
-          <Button variant="outline" onClick={() => setSortHistory(['title'])}>
-            <ChevronsUpDown />
-            Sort by Title
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setSortHistory(['category'])}
-          >
-            <ChevronsUpDown />
-            Sort by Category
-          </Button>
+          {renderSortButtons()}
         </div>
       </div>
       <AnimatePresence>
