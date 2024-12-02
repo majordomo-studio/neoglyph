@@ -1,3 +1,5 @@
+// SECTION - File Imports and Helper Functions
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -98,6 +100,9 @@ const getItemSorter =
     }
     return 0;
   };
+
+// SECTION - Component Setup and Logic
+
 const DataBricks = ({
   items = [],
   filter = '*',
@@ -106,8 +111,15 @@ const DataBricks = ({
   schema = null,
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
-  const [sortKey, setSortKey] = useState(null);
-  const [sortAsc, setSortAsc] = useState(true);
+
+  // Respect defaultSorting from the schema if provided
+  const [sortKey, setSortKey] = useState(
+    schema?.defaultSorting?.[0]?.key || null
+  );
+  const [sortAsc, setSortAsc] = useState(
+    schema?.defaultSorting?.[0]?.desc === false
+  );
+
   const [categoryFilter, setCategoryFilter] = useState(filter);
   const [layoutMode, setLayoutMode] = useState('masonry');
   const [selectedCardId, setSelectedCardId] = useState(null);
@@ -140,7 +152,9 @@ const DataBricks = ({
         }
         return true;
       })
-      .sort(getItemSorter(sortKey, sortAsc));
+      .sort(
+        getItemSorter(sortKey || schema?.defaultSorting?.[0]?.key, sortAsc)
+      );
 
     setFilteredItems(sortedItems);
     setHiddenItemsExist(localItems.some((item) => item.isHidden));
@@ -167,22 +181,6 @@ const DataBricks = ({
     );
   };
 
-  const renderSortButtons = () => {
-    return schema?.sortable?.map((key) => (
-      <Button key={key} variant="outline" onClick={() => toggleSortKey(key)}>
-        {sortKey === key ? (
-          sortAsc ? (
-            <ArrowUp />
-          ) : (
-            <ArrowDown />
-          )
-        ) : (
-          <ChevronsUpDown />
-        )}
-        Sort by {formatKey(key)}
-      </Button>
-    ));
-  };
   const reorderKeys = (item, schema) => {
     if (!schema || !schema.order) return Object.entries(item);
     const orderedKeys = schema.order;
@@ -233,6 +231,25 @@ const DataBricks = ({
     await new Promise((resolve) => setTimeout(resolve, 500));
     setLocalItems((prev) => prev.filter((item) => item.id !== cardToDelete));
     setCardToDelete(null);
+  };
+
+  // SECTION - Render Functions
+
+  const renderSortButtons = () => {
+    return schema?.sortable?.map((key) => (
+      <Button key={key} variant="outline" onClick={() => toggleSortKey(key)}>
+        {sortKey === key ? (
+          sortAsc ? (
+            <ArrowUp />
+          ) : (
+            <ArrowDown />
+          )
+        ) : (
+          <ChevronsUpDown />
+        )}
+        Sort by {formatKey(key)}
+      </Button>
+    ));
   };
 
   const renderKeyValuePairsInTable = (keyValuePairs) => (
@@ -356,6 +373,7 @@ const DataBricks = ({
       </div>
     );
   };
+
   const renderItems = () =>
     filteredItems.map((item, index) => {
       const isSelected = selectedCardId === item.id;
