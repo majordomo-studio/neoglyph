@@ -25,22 +25,11 @@
       {
         default = pkgs.mkShellNoCC {
           packages = with pkgs; [
-            vscode
-            firebase-tools
             nodenv
             nodejs
             nodePackages.npm
             nodePackages.pnpm
-            electron
-            python3
           ];
-
-          # VSCode extension installation
-          shellHook = ''
-            mkdir -p .vscode/extensions
-            code --install-extension catppuccin.catppuccin-vsc --force
-            # Add more extensions here as needed
-          '';
         };
       }
     );
