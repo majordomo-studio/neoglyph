@@ -1,6 +1,6 @@
 {
   "name": "@majordomo.studio/neoglyph",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "",
   "keywords": [
     "react",
@@ -10,6 +10,14 @@
   "author": "GGG",
   "license": "MIT",
   "private": true,
+  "files": [
+    "add.js",
+    "components/DataBricks.js",
+    "components/DataBricksFacetedFilter.js",
+    "components/DataGrid.js",
+    "components/DataGridFacetedFilter.js"
+  ],
+  "publishConfig": { "access" : "public" },
   "bin": {
     "add": "./add.js"
   },
@@ -18,7 +26,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "release": "semantic-release"
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",

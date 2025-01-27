@@ -1,6 +1,6 @@
 module.exports = {
-  branches: ["main"], // The branch you want to release from
-  repositoryUrl: "https://github.com/<your-username>/<your-repo>.git",
+  branches: ["main", { name: "next", prerelease: true }], // The branch you want to release from
+  repositoryUrl: "https://github.com/majordomo-studio/neoglyph.git",
   plugins: [
     "@semantic-release/commit-analyzer", // Analyze commit messages
     "@semantic-release/release-notes-generator", // Generate release notes
