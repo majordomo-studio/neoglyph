@@ -1,5 +1,3 @@
-// SECTION - File Imports and Helper Functions
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';

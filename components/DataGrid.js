@@ -48,7 +48,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 import {
   MoreHorizontal,
   ChevronLeft,
@@ -59,22 +58,23 @@ import {
   ArrowUp,
   ArrowDown,
   Settings2,
-} from 'lucide-react'; // Import icons
-import { Switch } from '@/components/ui/switch'; // Import ShadCN Switch
-import { Calendar } from '@/components/ui/calendar'; // Import ShadCN Calendar for date editing
+} from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'; // ShadCN Popover for date picker
+} from '@/components/ui/popover';
 import {
   TooltipProvider,
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-} from '@/components/ui/tooltip'; // Import Tooltip
+} from '@/components/ui/tooltip';
 import { format } from 'date-fns'; // Import date-fns for formatting dates
 import { cn } from '@/lib/utils'; // Utility class names
+import { DataGridFacetedFilter } from './DataGridFacetedFilter';
 import { z } from 'zod'; // Import zod for schema validation
 
 // Helper function to format keys for display purposes
@@ -574,7 +574,7 @@ export default function DataGrid({ data = [], schema = null }) {
                   return null;
                 }
                 return (
-                  <DataTableFacetedFilter
+                  <DataGridFacetedFilter
                     key={key}
                     column={column}
                     title={formatKey(key)}
