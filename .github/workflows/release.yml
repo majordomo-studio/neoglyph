@@ -28,9 +28,11 @@ jobs:
           node-version: 'lts/*' # Use the latest stable Node.js
           cache: 'pnpm'
 
-      # Setup pnpm
+      # Install pnpm
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
 
       # Install dependencies using pnpm
       - name: Install dependencies
@@ -44,4 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Add this to your GitHub repository secrets
-        run: npx semantic-release
+        run: pnpm exec semantic-release
