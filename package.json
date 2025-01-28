@@ -1,6 +1,6 @@
 {
   "name": "@majordomo.studio/neoglyph",
-  "version": "0.0.0-development",
+  "version": "1.0.0",
   "description": "",
   "keywords": [
     "react",
@@ -68,6 +68,7 @@
     }
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.1",
     "@semantic-release/npm": "^12.0.1",
