@@ -2,8 +2,6 @@
 
 A plug-n-play component library for data visualization.
 
-This is still under active development - all components are working.
-
 ## Installation
 
 ```bash

@@ -9,7 +9,7 @@
   ],
   "author": "GGG",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "files": [
     "add.js",
     "components/DataBricks.js",
