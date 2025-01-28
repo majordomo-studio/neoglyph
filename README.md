@@ -12,3 +12,6 @@ npx @majordomo.studio/neoglyph@latest add datagrid
 ```
 
 Components will be installed to the ui folder.
+
+## Usage
+
