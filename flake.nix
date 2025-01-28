@@ -29,6 +29,7 @@
             nodejs
             nodePackages.npm
             nodePackages.pnpm
+            bun
           ];
         };
       }

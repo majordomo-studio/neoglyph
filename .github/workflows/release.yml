@@ -21,33 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Install Bun
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: 'lts/*' # Use the latest stable Node.js
-          cache: 'pnpm'
+          bun-version: latest # Use latest Bun version
 
-      # Setup pnpm using the official action
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: latest
+      # Verify Bun installation (optional but useful for debugging)
+      - name: Check Bun version
+        run: bun --version
 
-      # Verify pnpm installation
-      - name: Check pnpm version
-        run: pnpm --version
-
-      # Install dependencies using pnpm
+      # Install dependencies using Bun
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: bun install
 
       - name: Audit Signatures
-        run: pnpm audit signatures
+        run: bun audit
 
-      # Run semantic release
+      # Run Semantic Release
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Add this to your GitHub repository secrets
-        run: pnpm exec semantic-release
+        run: bunx semantic-release

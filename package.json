@@ -17,16 +17,18 @@
     "components/DataGrid.js",
     "components/DataGridFacetedFilter.js"
   ],
-  "publishConfig": { "access" : "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "add": "./add.js"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "semantic-release": "semantic-release"
+    "dev": "bun run next dev",
+    "build": "bun run next build",
+    "start": "bun run next start",
+    "lint": "bun run next lint",
+    "semantic-release": "bunx semantic-release"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
