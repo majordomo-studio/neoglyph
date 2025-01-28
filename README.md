@@ -15,3 +15,4 @@ Components will be installed to the ui folder.
 
 ## Usage
 
+1. Review the code and `README.md` in `app/bricks` or `app/grid` to see a simple implementation.
