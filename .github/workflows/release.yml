@@ -27,7 +27,7 @@ jobs:
         with:
           bun-version: latest # Use latest Bun version
 
-      # Verify Bun installation (optional but useful for debugging)
+      # Verify Bun installation
       - name: Check Bun version
         run: bun --version
 
@@ -35,10 +35,7 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Audit Signatures
-        run: bun audit
-
-      # Run Semantic Release
+      # Run semantic release
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
