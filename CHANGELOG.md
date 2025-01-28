@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/majordomo-studio/neoglyph/compare/v1.1.0...v1.2.0) (2025-01-28)
+
+
+### Features
+
+* initial release ([cd8db66](https://github.com/majordomo-studio/neoglyph/commit/cd8db66f949578e2cf695029448f76d942f09f80))
+
 # [1.1.0](https://github.com/majordomo-studio/neoglyph/compare/v1.0.0...v1.1.0) (2025-01-28)
 
 
