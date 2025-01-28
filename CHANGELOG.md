@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/majordomo-studio/neoglyph/compare/v1.2.0...v1.2.1) (2025-01-28)
+
+
+### Bug Fixes
+
+* allow npm publishing by setting private to false ([04b9c2e](https://github.com/majordomo-studio/neoglyph/commit/04b9c2e60231f42525b32084d58a031efe845e44))
+
 # [1.2.0](https://github.com/majordomo-studio/neoglyph/compare/v1.1.0...v1.2.0) (2025-01-28)
 
 
