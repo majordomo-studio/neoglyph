@@ -28,11 +28,13 @@ jobs:
           node-version: 'lts/*' # Use the latest stable Node.js
           cache: 'pnpm'
 
-      # Install pnpm
+      # Explicitly install pnpm (Ensures pnpm is available)
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: latest
+        run: npm install -g pnpm
+
+      # Verify pnpm is installed (Optional Debugging Step)
+      - name: Check pnpm version
+        run: pnpm --version
 
       # Install dependencies using pnpm
       - name: Install dependencies
