@@ -1,5 +1,7 @@
 # NeoGlyph
 
+*** NPM installation is currently not working - PLEASE INSTALL MANUALLY ***
+
 A plug-n-play component library for data visualization.
 
 ## Installation
@@ -10,6 +12,12 @@ npx @majordomo.studio/neoglyph@latest add databricks
 # or
 npx @majordomo.studio/neoglyph@latest add datagrid
 ```
+
+## Manual Installation
+
+1. Copy DataBricks.js and DataBricksFacetedFilter.js to your component directory.
+2. Install shadcn dependencies.
+3. Install Frame Motion, DateFNS and Zod.
 
 Components will be installed to the ui folder.
 
