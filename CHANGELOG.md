@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/majordomo-studio/neoglyph/compare/v1.2.1...v1.2.2) (2025-01-30)
+
+
+### Bug Fixes
+
+* add manual installation  instructions ([f31db04](https://github.com/majordomo-studio/neoglyph/commit/f31db044b677ef4bf0a44d2a0021bad202777e3e))
+
 ## [1.2.1](https://github.com/majordomo-studio/neoglyph/compare/v1.2.0...v1.2.1) (2025-01-28)
 
 
